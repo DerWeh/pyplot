@@ -28,4 +28,5 @@ def parse_arguments():
 
 if __name__ == '__main__':
     args = parse_arguments()
-    print args
+    from plotter.plotn import main
+    main(args)

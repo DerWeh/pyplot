@@ -9,14 +9,15 @@ def parse_arguments():
     return parser
 
 
-if __name__ == '__main__':
+def main(args):
     import pylab
 
     import numpy as np
     import matplotlib.pyplot as plt
 
-    parser = parse_arguments()
-    start = parser.parse_args().start
+    # parser = parse_arguments()
+    # start = parser.parse_args().start
+    start = args.start
 
     try:
         n = np.atleast_2d(np.loadtxt("nsteps.dat"))
@@ -58,3 +59,9 @@ if __name__ == '__main__':
 
 
     plt.show()
+
+
+if __name__ == '__main__':
+    parser = parse_arguments()
+    args = parser.parse_args()
+    main(args)
