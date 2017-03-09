@@ -3,7 +3,7 @@ import argparse
 
 def parse_arguments():
     print __doc__
-    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0])
+    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0],add_help=False)
     parser.add_argument('-s', '--start', action='store', type=int, default=0,
                         help='the number of the first iteration to plot')
     return parser
