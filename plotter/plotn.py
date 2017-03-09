@@ -10,7 +10,6 @@ def parse_arguments():
 
 
 if __name__ == '__main__':
-    import sys
     import pylab
 
     import numpy as np
@@ -18,10 +17,6 @@ if __name__ == '__main__':
 
     parser = parse_arguments()
     start = parser.parse_args().start
-
-    # start = 0
-    # if(len(sys.argv)==2):
-        # start = int(sys.argv[1])
 
     try:
         n = np.atleast_2d(np.loadtxt("nsteps.dat"))
