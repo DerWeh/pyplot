@@ -13,22 +13,25 @@ It can then be run via
     $ pyplot SCRIPTNAME {COMMAND LINE PARAMETERES}
 
 ==================================================
-Required structure for the scripts:
+# Required structure for the scripts:
 -------------------------
-Currently the scripts to be launched form `pyplot` have to fulfill the following structure:
+Currently the scripts to be launched form `pyplot` have to fulfill either of the following structures:
 
- 1. implement a function `get_parser(add_help)` which returns a `ArgumentParser` the argument parser 
-    has to be created with `ArgumentParser(..., add_help=add_help)`. This is necessary that the parser 
-    can be used as a parent.
- 2. implement a `main(args)` function which takes the namespace object which would be created by the 
-    argument parser as argument
+  1. a. implement a function `get_parser(add_help)` which returns a `ArgumentParser` the argument parser 
+        has to be created with `ArgumentParser(..., add_help=add_help)`. This is necessary that the parser 
+        can be used as a parent.
+     b. implement a `main(args)` function which takes the namespace object which would be created by the 
+        argument parser as argument
+  2. a. don't have a function `get_parser(add_help)`
+     b. implement a function `main()` which doesn't need any arguments. `sys.argv` will be replaced 
+        to mimic a native call.
 
 ==================================================
 #TODO:
 
- - fix autocompletion of arguments (enable it via `configure`)
- - make it stable (adding test)
- - make the project structure more dynamic
- - allow subpoints to group scripts
- - relax the structural requirements for the scripts (ArgumentParser optional)
+ - [ ] fix autocompletion of arguments (enable it via `configure`)
+ - [ ] make it stable (adding test)
+ - [ ] make the project structure more dynamic
+ - [ ] allow subpoints to group scripts
+ - [x] relax the structural requirements for the scripts (ArgumentParser optional)
 
