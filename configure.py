@@ -6,6 +6,7 @@
 from __future__ import print_function
 
 import argparse
+from string import Formatter
 
 
 def get_parser(add_help=True):
@@ -14,41 +15,83 @@ def get_parser(add_help=True):
     subparsers = parser.add_subparsers()
     update_parser = subparsers.add_parser(
         'update', help='Updates the list of scripts in plotter',)
-    update_parser.set_defaults(execute=update)
+    update_parser.set_defaults(execute=Updater.update)
     return parser
 
 
-def update():
-    """update the available plotting scripts"""
+class TemplateFormatter(Formatter):
+    """substitute formatter for easy template actions
+    
+    defines the following new formatter:
+    `call`
+        {foo} -> foo()
+        the expression will be evaluated
+    `repeat`
+        {foo:repeat:bar {{item}}}
+        the string after `repeat:` will be repeated for each item
+    `if`
+        {foo:if:bar}
+        bar will be inserted if fo is True"""
+
+    def format_field(self, value, spec):
+        if spec == 'call':
+            return value()
+        elif spec.startswith('repeat'):
+            template = spec.partition(':')[-1]
+            if isinstance(value, dict):
+                value = value.items()
+            return ''.join((template.format(item=item) for item in value))
+        elif spec.startswith('if'):
+            return value and spec.partition(':')[-1]
+        else:
+            return super(TemplateFormatter, self).format_field(value, spec)
+
+
+class Updater(object):
+    """handles which plotting scripts are available"""
     import os.path
+    from textwrap import dedent
 
     projectroot = os.path.abspath(os.path.dirname(__file__))
     script_dir = os.path.join(projectroot, 'plotter')
-    content = os.listdir(script_dir)
+    sf = TemplateFormatter()
 
-    def is_valid(filename):
-        # also check for leading '.' to ignore swaps etc.
-        valid = (os.path.isfile(os.path.join(script_dir, filename)) and
+    template = dedent(
+        """\
+        __all__ = [
+        {lines:repeat:    '{{item}}',
+        }]"""
+    )
+
+    @classmethod
+    def is_valid(cls, filename):
+        """checks if `filename` is a python script
+
+        Also checks that `filename` starts with '.' to avoid swaps and similar.
+        """
+        from os.path import isfile, join
+        valid = (isfile(join(cls.script_dir, filename)) and
                  '.py' in filename and not filename.startswith('.'))
         return valid
-    #TODO: clean this part up, it is to error prone without unit tests
-    #TODO: use template for the file creation on keep readable script names
 
-    scripts = ["'"+file.split('.py')[0]+"'," for file in content if is_valid(file)]
-    unique = set(scripts) - set(("'__init__',",))
+    @classmethod
+    def update(cls):
+        """update the available plotting scripts"""
+        import os.path
 
-    template = """\
-__all__ = [
-{lines}
-]
-"""
-    with open(os.path.join(script_dir, '__init__.py'), 'w') as init_file:
-        init_file.write(template.format(lines='\n'.join(unique)))
-    print("`plotter` was successfully updated.")
-    print("The scripts:")
-    for name in unique:
-        print(name)
-    print("should now be available.")
+        content = os.listdir(cls.script_dir)
+
+        scripts = [file.split('.py')[0] for file in content if cls.is_valid(file)]
+        unique = set(scripts) - set(("__init__",))
+
+        init_content = cls.sf.format(cls.template, lines=unique)
+        with open(os.path.join(cls.script_dir, '__init__.py'), 'w') as init_file:
+            init_file.write(init_content)
+        print("`plotter` was successfully updated.")
+        print("The scripts:")
+        for name in unique:
+            print(name)
+        print("should now be available.")
 
 
 def main(args):

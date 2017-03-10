@@ -9,12 +9,14 @@ import argcomplete
 import plotter
 from configure import (get_parser as conf_get_parser,
                        main as conf_main)
+
+
 def parse_arguments():
     """Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(
-        title = 'plotter',
-        description = 'available plotting scripts',
+        title='plotter',
+        description= 'available plotting scripts',
         dest='used_subparser',
     )
     module_subparser = {}
@@ -25,7 +27,11 @@ def parse_arguments():
             help=module.__doc__.split('\n', 1)[0]
         )
         module_subparser[module_str].set_defaults(run=module.main)
-    configure = subparsers.add_parser('configure', parents=(conf_get_parser(add_help=False),), help='configure this script.')
+
+    configure = subparsers.add_parser(
+        'configure', parents=(conf_get_parser(add_help=False),),
+        help='configure this script.'
+    )
     configure.set_defaults(run=conf_main)
 
     argcomplete.autocomplete(parser)
