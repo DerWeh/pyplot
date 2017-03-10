@@ -6,7 +6,7 @@
 
 import argparse
 import argcomplete
-
+import plotter
 
 def parse_arguments():
     """Argument Parser, providing available scripts"""
@@ -15,8 +15,15 @@ def parse_arguments():
         title = 'plotter',
         description = 'available plotting scripts'
     )
+    module_subparser = {}
+    # for module in plotter.__all__:
+    #     from plotter import module
+    #     module_subparser[module] = subparsers.add_parser(
+    #         str(modul), parents=[module.get_parser(help=False)
+        
+
     from plotter import plotn
-    test = subparsers.add_parser('plotn', parents=[plotn.get_parser()],
+    test = subparsers.add_parser('plotn', parents=[plotn.get_parser(help=False)],
                                  help=plotn.__doc__.split('\n',1)[0])
     configure = subparsers.add_parser('configure', help='configure this script.')
 

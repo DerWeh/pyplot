@@ -1,10 +1,10 @@
+# PYTHON_ARGCOMPLETE_OK
 """existing plotting script to test with."""
 import argparse
 
 
 def get_parser(add_help=True):
-    print __doc__
-    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0],add_help=True)
+    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0],add_help=add_help)
     parser.add_argument('-s', '--start', action='store', type=int, default=0,
                         help='the number of the first iteration to plot')
     return parser
