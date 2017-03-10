@@ -14,7 +14,7 @@ import pytest
 from .. import pyplot
 from ..configure import Updater
 
-@pytest.mark.parametrize("arguments", [Updater.get_moduels(), ['configure',None]])
+@pytest.mark.parametrize("arguments", [Updater.get_moduels(), ['configure', None]])
 def test_trivial(arguments, capsys):
     """runs the help messages"""
     for arg in arguments:
@@ -23,5 +23,3 @@ def test_trivial(arguments, capsys):
             parser.parse_args([arg, '--help'])
     out, err = capsys.readouterr()
     assert 'usage: 'in out
-
-

@@ -9,15 +9,15 @@ from sys import path as syspath
 PATH = path.abspath(path.dirname(__file__))
 syspath.append(path.join(PATH, pardir))
 
-import pytest
 from .. import configure
 from textwrap import dedent
 
 
 def test_template():
+    """test the template used to write the '__init__' file"""
     template = configure.Updater.template
-    sf = configure.TemplateFormatter()
-    filled = sf.format(template, lines=('foo', 'bar'))
+    t_form = configure.TemplateFormatter()
+    filled = t_form.format(template, lines=('foo', 'bar'))
     correct = dedent(
         """\
         __all__ = [
