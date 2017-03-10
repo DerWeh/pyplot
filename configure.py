@@ -9,16 +9,17 @@ import argparse
 
 
 def get_parser(add_help=True):
-    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0],
+    parser = argparse.ArgumentParser(description=__doc__.split('\n', 1)[0],
                                      add_help=add_help)
     subparsers = parser.add_subparsers()
-    update_parser = subparsers.add_parser('update',
-        help='Updates the list of scripts in plotter')
+    update_parser = subparsers.add_parser(
+        'update', help='Updates the list of scripts in plotter',)
     update_parser.set_defaults(execute=update)
     return parser
 
 
 def update():
+    """update the available plotting scripts"""
     import os.path
 
     projectroot = os.path.abspath(os.path.dirname(__file__))
@@ -28,7 +29,7 @@ def update():
     def is_valid(filename):
         # also check for leading '.' to ignore swaps etc.
         valid = (os.path.isfile(os.path.join(script_dir, filename)) and
-                 '.py' in file and not filename.startswith('.'))
+                 '.py' in filename and not filename.startswith('.'))
         return valid
     #TODO: clean this part up, it is to error prone without unit tests
     #TODO: use template for the file creation on keep readable script names
