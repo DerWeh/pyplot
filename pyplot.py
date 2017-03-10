@@ -22,11 +22,27 @@ def parse_arguments():
     module_subparser = {}
     for module_str in plotter.__all__:
         module = __import__('plotter.' + module_str, fromlist=module_str)
-        module_subparser[module_str] = subparsers.add_parser(
-            module_str, parents=(module.get_parser(add_help=False),),
-            help=module.__doc__.split('\n', 1)[0]
-        )
-        module_subparser[module_str].set_defaults(run=module.main)
+        try:
+            module_subparser[module_str] = subparsers.add_parser(
+                module_str, parents=(module.get_parser(add_help=False),),
+                description=module.__doc__,
+                help=module.__doc__.split('\n', 1)[0]
+            )
+            module_subparser[module_str].set_defaults(run=module.main)
+        except AttributeError:
+            # module doesn't provide `get_parser`
+            module_subparser[module_str] = subparsers.add_parser(
+                module_str,
+                description=module.__doc__,
+                help=module.__doc__.split('\n', 1)[0],
+            )
+            module_subparser[module_str].add_argument(
+                'arguments',
+                nargs=argparse.REMAINDER,
+                help='possible unknown arguments for {module}'.format(module=module_str),
+            )
+            module_subparser[module_str].set_defaults(run=substitute, name=module_str,
+                                                      main=module.main)
 
     configure = subparsers.add_parser(
         'configure', parents=(conf_get_parser(add_help=False),),
@@ -39,6 +55,15 @@ def parse_arguments():
     return args
 
 
+def substitute(args):
+    import sys
+    replace_argv = [args.name,] + args.arguments
+    sys.argv = replace_argv
+    args.main()
+
+
 if __name__ == '__main__':
     args = parse_arguments()
+    print args
+    print "lets override sys.argv"
     args.run(args)
