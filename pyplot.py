@@ -6,8 +6,6 @@
 
 import argparse
 import argcomplete
-import plotter
-
 
 
 def parse_arguments():
@@ -17,8 +15,9 @@ def parse_arguments():
         title = 'plotter',
         description = 'available plotting scripts'
     )
-    import plotter.plotn
-    test = subparsers.add_parser('plotn', parents=[plotter.plotn.parse_arguments()], help=plotter.plotn.__doc__.split('\n',1)[0])
+    from plotter import plotn
+    test = subparsers.add_parser('plotn', parents=[plotn.get_parser()],
+                                 help=plotn.__doc__.split('\n',1)[0])
     configure = subparsers.add_parser('configure', help='configure this script.')
 
     argcomplete.autocomplete(parser)

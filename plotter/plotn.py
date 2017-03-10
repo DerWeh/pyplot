@@ -1,9 +1,10 @@
 """existing plotting script to test with."""
 import argparse
 
-def parse_arguments():
+
+def get_parser(add_help=True):
     print __doc__
-    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0],add_help=False)
+    parser = argparse.ArgumentParser(description=__doc__.split('\n',1)[0],add_help=True)
     parser.add_argument('-s', '--start', action='store', type=int, default=0,
                         help='the number of the first iteration to plot')
     return parser
@@ -11,12 +12,9 @@ def parse_arguments():
 
 def main(args):
     import pylab
-
     import numpy as np
     import matplotlib.pyplot as plt
 
-    # parser = parse_arguments()
-    # start = parser.parse_args().start
     start = args.start
 
     try:
@@ -48,7 +46,6 @@ def main(args):
         N = int(content[5])
         U = np.fromstring(content[28 + N*2], sep = ' ')
         mu = np.fromstring(content[29 + N*2], sep = ' ')
-
         if(N>10):
             N = N/10
         else:
@@ -56,12 +53,10 @@ def main(args):
         pos = range(0,len(n[0]),N)
         labels = ['{0}\nU={1}\nmu={2}'.format(i,U[i],mu[i]) for i in pos]
         pylab.xticks(pos, labels)
-
-
     plt.show()
 
 
 if __name__ == '__main__':
-    parser = parse_arguments()
+    parser = get_parser()
     args = parser.parse_args()
     main(args)
