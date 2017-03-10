@@ -13,15 +13,17 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(
         title = 'plotter',
-        description = 'available plotting scripts'
+        description = 'available plotting scripts',
+        dest='used_subparser',
     )
     module_subparser = {}
     for module_str in plotter.__all__:
-        module = __import__('.'.join(('plotter', module_str)), fromlist=module_str)
+        module = __import__('plotter.' + module_str, fromlist=module_str)
         module_subparser[module_str] = subparsers.add_parser(
             module_str, parents=[module.get_parser(add_help=False)],
             help=module.__doc__.split('\n', 1)[0]
         )
+        module_subparser[module_str].set_defaults(run=module.main)
     configure = subparsers.add_parser('configure', help='configure this script.')
 
     argcomplete.autocomplete(parser)
@@ -31,5 +33,4 @@ def parse_arguments():
 
 if __name__ == '__main__':
     args = parse_arguments()
-    from plotter.plotn import main
-    main(args)
+    args.run(args)
