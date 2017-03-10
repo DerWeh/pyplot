@@ -75,15 +75,20 @@ class Updater(object):
         return valid
 
     @classmethod
+    def get_moduels(cls):
+        """Return all valid names of scripts in `script_dir`"""
+        import os.path
+        content = os.listdir(cls.script_dir)
+        scripts = [file.split('.py')[0] for file in content if cls.is_valid(file)]
+        module_names = set(scripts) - set(("__init__",))
+        return module_names
+
+    @classmethod
     def update(cls):
         """update the available plotting scripts"""
         import os.path
 
-        content = os.listdir(cls.script_dir)
-
-        scripts = [file.split('.py')[0] for file in content if cls.is_valid(file)]
-        unique = set(scripts) - set(("__init__",))
-
+        unique = cls.get_moduels()
         init_content = cls.sf.format(cls.template, lines=unique)
         with open(os.path.join(cls.script_dir, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
