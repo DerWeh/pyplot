@@ -3,7 +3,7 @@
 """Module for the configuration of the pyplot script
 
 """
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import argparse
 from string import Formatter
