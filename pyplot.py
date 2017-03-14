@@ -3,6 +3,7 @@
 """Module to bundle plotting scripts
 
 `activate-global-python-argcomplete` must be run to enable auto completion """
+from __future__ import absolute_import
 
 import argparse
 import argcomplete
