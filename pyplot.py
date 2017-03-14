@@ -17,7 +17,7 @@ def get_parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(
         title='plotter',
-        description='available plotting scripts',
+        description= 'available plotting scripts',
         dest='used_subparser',
     )
     for module_str in plotter.__all__:
