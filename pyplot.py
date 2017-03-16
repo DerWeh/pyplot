@@ -6,27 +6,32 @@
 from __future__ import absolute_import, print_function
 
 import argparse
-# import os
-# import os.path
+import os
 from collections import defaultdict
 
 import argcomplete
-import plotter
 import configure
 
 SCRIPT_DIR = 'plotter'
 
 
-# def _help(arg, dirname, fnames):
-#     print((dirname.replace(os.sep, '.')))
-#     return (dirname.replace(os.sep, '.'))
+def register_scripts(subparsers, dirname, fnames):
+    """Registers all scripts in `__all__` if dirname is module"""
+    parent_module_str = dirname.replace(os.sep, '.')
+    try:
+        parent_module = __import__(parent_module_str,
+                                   fromlist=parent_module_str)
+    except ImportError:
+        #directories which aren't a module are ignored
+        return
+    try:
+        parent_module.__all__
+    except AttributeError:
+        return
+    for module_str in parent_module.__all__:
+        module = __import__(parent_module_str + '.' + module_str, fromlist=module_str)
+        register_parser(subparsers[parent_module_str], module_str, module)
 
-# os.path.walk('plotter', _help, None)
-# def register_subparsers(subparsers, parser):
-#     subparsers[name].add_subparsers(
-#         title=str(parser)
-
-#     )
 
 class ParserDict(defaultdict):
     """Dictionary of the parsers in the parser tree
@@ -77,12 +82,7 @@ def get_parser():
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
     subparsers = SubparserDict(parser)
-    for module_str in plotter.__all__:
-        module = __import__(SCRIPT_DIR + '.' + module_str, fromlist=module_str)
-        register_parser(subparsers[SCRIPT_DIR], module_str, module)
-
-    module = __import__('plotter.sub1.toyplot', fromlist='toyplot')
-    register_parser(subparsers['plotter.sub1'], 'toyplot', module)
+    os.path.walk(SCRIPT_DIR, register_scripts, subparsers)
 
     register_parser(subparsers[SCRIPT_DIR], 'configure', configure)
 
@@ -91,7 +91,10 @@ def get_parser():
 
 
 def register_parser(subparsers, module_str, module):
-    """register `module` to `subparsers`"""
+    """Add a parser `module_str` to `subparsers`
+    
+    The main function of `module` will be assigned to the `run` argument if
+    `module` has a `get_parser` function, else `substitute` will be assigned."""
     try:
         module_subparser = subparsers.add_parser(
             module_str, parents=(module.get_parser(add_help=False),),
