@@ -96,12 +96,7 @@ def register_parser(subparsers, module_str, module):
     The main function of `module` will be assigned to the `run` argument if
     `module` has a `get_parser` function, else `substitute` will be assigned."""
     try:
-        module_subparser = subparsers.add_parser(
-            module_str, parents=(module.get_parser(add_help=False),),
-            description=module.__doc__,
-            help=module.__doc__.split('\n', 1)[0]
-        )
-        module_subparser.set_defaults(run=module.main)
+        paren_parser = module.get_parser(add_help=False)
     except AttributeError:
         # module doesn't provide `get_parser`
         module_subparser = subparsers.add_parser(
@@ -115,6 +110,13 @@ def register_parser(subparsers, module_str, module):
             help='possible unknown arguments for {module}'.format(module=module_str),
         )
         module_subparser.set_defaults(run=substitute, name=module_str, main=module.main)
+    else:
+        module_subparser = subparsers.add_parser(
+            module_str, parents=(paren_parser,),
+            description=module.__doc__,
+            help=module.__doc__.split('\n', 1)[0]
+        )
+        module_subparser.set_defaults(run=module.main)
 
 
 def substitute(args):
