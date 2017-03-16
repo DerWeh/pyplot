@@ -26,7 +26,16 @@ SCRIPT_DIR = 'plotter'
 #         title=str(parser)
 
 #     )
+
 class parser_dict(defaultdict):
+    """Dictionary of the parsers in the parser tree
+
+    the connection is always parser -> sub_parser -> parser -> sub_parser
+    This dictionary contains the parser elements, which need to be stored in a
+    `.` notation (e.g. 'root.sub.subsub').
+    It is in a cyclic dependency with subparser_dict and should not explicitly
+    be used, to avoid infinite recursion.
+    """
     def __init__(self, subparser_dict):
         super(defaultdict, self).__init__()
         self.subparsers = subparser_dict
@@ -43,32 +52,21 @@ class parser_dict(defaultdict):
 class subparser_dict(defaultdict):
     """dictionary for the added subparsers
 
-    if the key doesn't exist, a new sub_parser with the title of the key will
-    be added"""
+    If the key doesn't exist, a new sub_parser will be added. It is only to be
+    used with a dot notation (e.g. 'root.sub.subsub').
+    """
     def __init__(self, parser):
+        """The dependant parser_dict is created.
+
+        `parser` will be assigned as it's root.
+        """
         super(defaultdict, self).__init__()
-        # self.parser = parser
         self.parser_dict = parser_dict(self)
         self.parser_dict[SCRIPT_DIR] = parser
 
     def __missing__(self, key):
         print(key)
         print(key.rpartition('.')[0])
-        # parent, _, title = key.rpartition('.')
-        # if parent:
-        #     self.parser_dict[parent] = self[parent].add_parser(
-        #         title,
-        #         help="access members of {0}".format(parent)
-        #     )
-        #     self[key] = self.parser_dict[parent].add_subparsers(
-        #         title=key,
-        #         dest='used_subparser',
-        #     )
-        # else:
-        #     self[key] = self.parser.add_subparsers(
-        #         title=key,
-        #         dest='used_subparser',
-        #     )
         self[key] = self.parser_dict[key].add_subparsers(
             title=key,
             dest='used_subparser',
@@ -85,10 +83,6 @@ def get_parser():
         register_parser(subparsers[SCRIPT_DIR], module_str, module)
 
     module = __import__('plotter.sub1.toyplot', fromlist='toyplot')
-    # sub1 = subparsers[SCRIPT_DIR].add_parser('sub1', help='this is my sub')
-    # sub1_sub = sub1.add_subparsers(title='sub1_sub', dest='used_subparser')
-    # register_parser(sub1_sub, 'toyplot', module)
-
     register_parser(subparsers['plotter.sub1'], 'toyplot', module)
 
     register_parser(subparsers[SCRIPT_DIR], 'configure', configure)
