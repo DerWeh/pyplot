@@ -11,6 +11,7 @@ import plotter
 import os
 import os.path
 import configure
+from collections import defaultdict
 
 SCRIPT_DIR = 'plotter'
 
@@ -23,22 +24,74 @@ SCRIPT_DIR = 'plotter'
 # def register_subparsers(subparsers, parser):
 #     subparsers[name].add_subparsers(
 #         title=str(parser)
+
 #     )
+class parser_dict(defaultdict):
+    def __init__(self, subparser_dict):
+        super(defaultdict, self).__init__()
+        self.subparsers = subparser_dict
+
+    def __missing__(self, key):
+        parent, _, title = key.rpartition('.')
+        self[key] = self.subparsers[parent].add_parser(
+            title,
+            help="access members of {0}".format(title)
+        )
+        return self[key]
+
+
+class subparser_dict(defaultdict):
+    """dictionary for the added subparsers
+
+    if the key doesn't exist, a new sub_parser with the title of the key will
+    be added"""
+    def __init__(self, parser):
+        super(defaultdict, self).__init__()
+        # self.parser = parser
+        self.parser_dict = parser_dict(self)
+        self.parser_dict[SCRIPT_DIR] = parser
+
+    def __missing__(self, key):
+        print(key)
+        print(key.rpartition('.')[0])
+        # parent, _, title = key.rpartition('.')
+        # if parent:
+        #     self.parser_dict[parent] = self[parent].add_parser(
+        #         title,
+        #         help="access members of {0}".format(parent)
+        #     )
+        #     self[key] = self.parser_dict[parent].add_subparsers(
+        #         title=key,
+        #         dest='used_subparser',
+        #     )
+        # else:
+        #     self[key] = self.parser.add_subparsers(
+        #         title=key,
+        #         dest='used_subparser',
+        #     )
+        self[key] = self.parser_dict[key].add_subparsers(
+            title=key,
+            dest='used_subparser',
+        )
+        return self[key]
 
 
 def get_parser():
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(
-        title=SCRIPT_DIR,
-        description='available plotting scripts',
-        dest='used_subparser',
-    )
+    subparsers = subparser_dict(parser)
     for module_str in plotter.__all__:
         module = __import__(SCRIPT_DIR + '.' + module_str, fromlist=module_str)
-        register_parser(subparsers, module_str, module)
+        register_parser(subparsers[SCRIPT_DIR], module_str, module)
 
-    register_parser(subparsers, 'configure', configure)
+    module = __import__('plotter.sub1.toyplot', fromlist='toyplot')
+    # sub1 = subparsers[SCRIPT_DIR].add_parser('sub1', help='this is my sub')
+    # sub1_sub = sub1.add_subparsers(title='sub1_sub', dest='used_subparser')
+    # register_parser(sub1_sub, 'toyplot', module)
+
+    register_parser(subparsers['plotter.sub1'], 'toyplot', module)
+
+    register_parser(subparsers[SCRIPT_DIR], 'configure', configure)
 
     argcomplete.autocomplete(parser)
     return parser
