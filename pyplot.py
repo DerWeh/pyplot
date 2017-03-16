@@ -6,12 +6,13 @@
 from __future__ import absolute_import, print_function
 
 import argparse
+# import os
+# import os.path
+from collections import defaultdict
+
 import argcomplete
 import plotter
-import os
-import os.path
 import configure
-from collections import defaultdict
 
 SCRIPT_DIR = 'plotter'
 
@@ -27,7 +28,7 @@ SCRIPT_DIR = 'plotter'
 
 #     )
 
-class parser_dict(defaultdict):
+class ParserDict(defaultdict):
     """Dictionary of the parsers in the parser tree
 
     the connection is always parser -> sub_parser -> parser -> sub_parser
@@ -37,7 +38,7 @@ class parser_dict(defaultdict):
     be used, to avoid infinite recursion.
     """
     def __init__(self, subparser_dict):
-        super(defaultdict, self).__init__()
+        super(ParserDict, self).__init__()
         self.subparsers = subparser_dict
 
     def __missing__(self, key):
@@ -49,19 +50,19 @@ class parser_dict(defaultdict):
         return self[key]
 
 
-class subparser_dict(defaultdict):
+class SubparserDict(defaultdict):
     """dictionary for the added subparsers
 
     If the key doesn't exist, a new sub_parser will be added. It is only to be
     used with a dot notation (e.g. 'root.sub.subsub').
     """
     def __init__(self, parser):
-        """The dependant parser_dict is created.
+        """The dependent parser_dict is created.
 
         `parser` will be assigned as it's root.
         """
-        super(defaultdict, self).__init__()
-        self.parser_dict = parser_dict(self)
+        super(SubparserDict, self).__init__()
+        self.parser_dict = ParserDict(self)
         self.parser_dict[SCRIPT_DIR] = parser
 
     def __missing__(self, key):
@@ -75,7 +76,7 @@ class subparser_dict(defaultdict):
 def get_parser():
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
-    subparsers = subparser_dict(parser)
+    subparsers = SubparserDict(parser)
     for module_str in plotter.__all__:
         module = __import__(SCRIPT_DIR + '.' + module_str, fromlist=module_str)
         register_parser(subparsers[SCRIPT_DIR], module_str, module)
@@ -125,6 +126,6 @@ def main(args):
     args.run(args)
 
 if __name__ == '__main__':
-    parser = get_parser()
-    args = parser.parse_args()
-    main(args)
+    PARSER = get_parser()
+    ARGS = PARSER.parse_args()
+    main(ARGS)
