@@ -65,8 +65,6 @@ class subparser_dict(defaultdict):
         self.parser_dict[SCRIPT_DIR] = parser
 
     def __missing__(self, key):
-        print(key)
-        print(key.rpartition('.')[0])
         self[key] = self.parser_dict[key].add_subparsers(
             title=key,
             dest='used_subparser',
