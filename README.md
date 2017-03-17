@@ -12,24 +12,24 @@ It can then be run via
 
     $ pyplot SCRIPTNAME {COMMAND LINE PARAMETERES}
 -------------------------
-==================================================
+
 # Required structure for the scripts:
 
 Currently the scripts to be launched form `pyplot` have to fulfill *either* of the following structures:
 
 1. 
-  1. implement a function `get_parser(add_help)` which returns a `ArgumentParser` the argument parser 
-        has to be created with `ArgumentParser(..., add_help=add_help)`. This is necessary that the parser 
-        can be used as a parent.
-  2. implement a `main(args)` function which takes the namespace object which would be created by the 
-        argument parser as argument
+   1. implement a function `get_parser(add_help)` which returns a `ArgumentParser` the argument parser 
+      has to be created with `ArgumentParser(..., add_help=add_help)`. This is necessary that the parser 
+      can be used as a parent.
+   2. implement a `main(args)` function which takes the namespace object which would be created by the 
+      argument parser as argument
 2. 
-  1. don't have a function `get_parser(add_help)`
-  2. implement a function `main()` which doesn't need any arguments. `sys.argv` will be replaced 
-     to mimic a native call.
+   1. don't have a function `get_parser(add_help)`
+   2. implement a function `main()` which doesn't need any arguments. `sys.argv` will be replaced 
+      to mimic a native call.
 
 -------------------------
-==================================================
+
 # Setting up argument completion:
 
 To set up argument completion execute
@@ -43,7 +43,7 @@ so e.g. `/home/user/pypot/pyplot.py` and `./pyplot.py`allow argument completion,
 or an alias it doesn't work yet.
 
 -------------------------
-==================================================
+
 # TODO:
 
  - [ ] add test for `update clean` as files are removed
