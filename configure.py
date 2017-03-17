@@ -17,6 +17,9 @@ def get_parser(add_help=True):
     update_parser = subparsers.add_parser(
         'update', help='Updates the list of scripts in plotter',)
     update_parser.set_defaults(execute=Updater.update)
+    clean_parser = subparsers.add_parser(
+        'clean', help='Removes all `__init__` files created by update')
+    clean_parser.set_defaults(execute=Updater.clean)
     return parser
 
 
@@ -85,26 +88,34 @@ class Updater(object):
     @classmethod
     def update_dir(cls, dirname):
         """update the available plotting scripts"""
-        print("called with " + dirname)
         unique = cls.get_moduels(dirname)
         init_content = cls.sf.format(cls.template, lines=unique)
         with open(os.path.join(dirname, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
         print("`{directory}` was successfully updated."
-              .format(directory=dirname))
+              .format(directory='plotter/'+dirname.lstrip(cls.projectroot)))
         print("The scripts:")
         for name in unique:
-            print(name)
+            print('\t'+name)
         print("should now be available.")
+        print("--------------------------------------------------")
 
     @classmethod
     def update(cls):
         """Iteratively updates all all available scripts for the subdirectories"""
-        print("I was called, proceeding with" + cls.script_dir)
         os.path.walk(cls.script_dir,
                      lambda args, dirname, fnames: cls.update_dir(dirname),
                      None)
 
+    @classmethod
+    def clean(cls):
+        """remove all the `__init__` files in the subdirectories."""
+        def _remove(filter, dirname, fnames):
+            full_fnames = (os.path.join(dirname, fname) for fname in fnames
+                           if filter in fname)
+            map(os.remove, full_fnames)
+            print(dirname+' cleaned.')
+        os.path.walk(cls.script_dir, _remove, '__init__.py')
 
 def main(args):
     args.execute()
