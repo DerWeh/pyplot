@@ -46,9 +46,10 @@ or an alias it doesn't work yet.
 ==================================================
 # TODO:
 
+ - [ ] add test for `update clean` as files are removed
  - [ ] fix autocompletion of arguments (enable it via `configure`)
  - [ ] make it stable (adding test)
  - [ ] make the project structure more dynamic
- - [ ] allow subpoints to group scripts
+ - [x] allow subpoints to group scripts
  - [x] relax the structural requirements for the scripts (ArgumentParser optional)
 
