@@ -50,7 +50,7 @@ class ParserDict(defaultdict):
         parent, _, title = key.rpartition('.')
         self[key] = self.subparsers[parent].add_parser(
             title,
-            help="access members of {0}".format(title)
+            help="::access members of {0}".format(title)
         )
         return self[key]
 
@@ -72,7 +72,7 @@ class SubparserDict(defaultdict):
 
     def __missing__(self, key):
         self[key] = self.parser_dict[key].add_subparsers(
-            title=key,
+            title='subcommands',
             dest='used_subparser',
         )
         return self[key]
