@@ -11,6 +11,7 @@ from string import Formatter
 
 
 def get_parser(add_help=True):
+    """Return the ArgumentParser"""
     parser = argparse.ArgumentParser(description=__doc__.split('\n', 1)[0],
                                      add_help=add_help)
     subparsers = parser.add_subparsers()
@@ -59,7 +60,7 @@ class Updater(object):
 
     projectroot = os.path.abspath(os.path.dirname(__file__))
     script_dir = os.path.join(projectroot, 'plotter')
-    sf = TemplateFormatter()
+    tformatter = TemplateFormatter()
 
     template = dedent(
         """\
@@ -83,7 +84,7 @@ class Updater(object):
     def get_moduels(cls, dirname):
         """Return all valid names of scripts in `script_dir`"""
         content = os.listdir(dirname)
-        scripts = [file.split('.py')[0] for file in content if cls.is_valid(file)]
+        scripts = [script.split('.py')[0] for script in content if cls.is_valid(file)]
         module_names = set(scripts) - set(("__init__",))
         return module_names
 
@@ -91,7 +92,7 @@ class Updater(object):
     def update_dir(cls, dirname):
         """update the available plotting scripts"""
         unique = cls.get_moduels(dirname)
-        init_content = cls.sf.format(cls.template, lines=unique)
+        init_content = cls.tformatter.format(cls.template, lines=unique)
         with open(os.path.join(dirname, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
         print("`{directory}` was successfully updated."
@@ -113,18 +114,18 @@ class Updater(object):
     def clean(cls, args):
         """remove all the `__init__` files in the subdirectories."""
         def _remove(args, dirname, fnames):
-            filter, dryrun = args
+            pattern, dryrun = args
             full_fnames = (os.path.join(dirname, fname) for fname in fnames
-                           if filter in fname)
+                           if pattern in fname)
             if dryrun:
                 print('In directory ' + dirname)
                 print('The following files will be removed: ')
-                map(lambda name: print(
-                        '\t' + os.path.basename(name)+'\t full name:'+name
-                    ),full_fnames)
+                for name in full_fnames:
+                    print('\t'+os.path.basename(name)+'\tfull name:'+name)
                 print('--------------------------------------------------')
             else:
-                map(os.remove, full_fnames)
+                for name in full_fnames:
+                    os.remove(name)
                 print(dirname+' cleaned.')
         os.path.walk(cls.script_dir, _remove, ('__init__.py', args.dryrun))
 
@@ -133,6 +134,6 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = get_parser()
-    args = parser.parse_args()
-    main(args)
+    PARSER = get_parser()
+    ARGS = PARSER.parse_args()
+    main(ARGS)
