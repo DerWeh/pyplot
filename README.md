@@ -1,6 +1,6 @@
 # pyplot
 -------------------------
-Module to centralize plotting scripts.
+Module to centralize plotting scripts. The scripts can be dumped into the _plotter_ folder, or subfolder in it and then be launched centrally with the __pyplot__ script.
 
 Currently scripts with the right structure can be dropped into the plotter directory.
 The command:
