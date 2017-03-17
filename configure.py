@@ -6,6 +6,7 @@
 from __future__ import print_function, absolute_import
 
 import argparse
+import os.path
 from string import Formatter
 
 
@@ -49,7 +50,6 @@ class TemplateFormatter(Formatter):
 
 class Updater(object):
     """handles which plotting scripts are available"""
-    import os.path
     from textwrap import dedent
 
     projectroot = os.path.abspath(os.path.dirname(__file__))
@@ -75,28 +75,35 @@ class Updater(object):
         return valid
 
     @classmethod
-    def get_moduels(cls):
+    def get_moduels(cls, dirname):
         """Return all valid names of scripts in `script_dir`"""
-        import os.path
-        content = os.listdir(cls.script_dir)
+        content = os.listdir(dirname)
         scripts = [file.split('.py')[0] for file in content if cls.is_valid(file)]
         module_names = set(scripts) - set(("__init__",))
         return module_names
 
     @classmethod
-    def update(cls):
+    def update_dir(cls, dirname):
         """update the available plotting scripts"""
-        import os.path
-
-        unique = cls.get_moduels()
+        print("called with " + dirname)
+        unique = cls.get_moduels(dirname)
         init_content = cls.sf.format(cls.template, lines=unique)
-        with open(os.path.join(cls.script_dir, '__init__.py'), 'w') as init_file:
+        with open(os.path.join(dirname, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
-        print("`plotter` was successfully updated.")
+        print("`{directory}` was successfully updated."
+              .format(directory=dirname))
         print("The scripts:")
         for name in unique:
             print(name)
         print("should now be available.")
+
+    @classmethod
+    def update(cls):
+        """Iteratively updates all all available scripts for the subdirectories"""
+        print("I was called, proceeding with" + cls.script_dir)
+        os.path.walk(cls.script_dir,
+                     lambda args, dirname, fnames: cls.update_dir(dirname),
+                     None)
 
 
 def main(args):
