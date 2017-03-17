@@ -81,17 +81,17 @@ class Updater(object):
         return valid
 
     @classmethod
-    def get_moduels(cls, dirname):
+    def get_modules(cls, dirname):
         """Return all valid names of scripts in `script_dir`"""
         content = os.listdir(dirname)
-        scripts = [script.split('.py')[0] for script in content if cls.is_valid(file)]
+        scripts = [script.split('.py')[0] for script in content if cls.is_valid(script)]
         module_names = set(scripts) - set(("__init__",))
         return module_names
 
     @classmethod
     def update_dir(cls, dirname):
         """update the available plotting scripts"""
-        unique = cls.get_moduels(dirname)
+        unique = cls.get_modules(dirname)
         init_content = cls.tformatter.format(cls.template, lines=unique)
         with open(os.path.join(dirname, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
@@ -106,15 +106,13 @@ class Updater(object):
     @classmethod
     def update(cls, args):
         """Iteratively updates all all available scripts for the subdirectories"""
-        os.path.walk(cls.script_dir,
-                     lambda args, dirname, fnames: cls.update_dir(dirname),
-                     None)
+        for dirpath, _, _ in os.walk(cls.script_dir):
+            cls.update_dir(dirpath)
 
     @classmethod
     def clean(cls, args):
         """remove all the `__init__` files in the subdirectories."""
-        def _remove(args, dirname, fnames):
-            pattern, dryrun = args
+        def _remove(pattern, dirname, fnames, dryrun=True):
             full_fnames = (os.path.join(dirname, fname) for fname in fnames
                            if pattern in fname)
             if dryrun:
@@ -127,7 +125,8 @@ class Updater(object):
                 for name in full_fnames:
                     os.remove(name)
                 print(dirname+' cleaned.')
-        os.path.walk(cls.script_dir, _remove, ('__init__.py', args.dryrun))
+        for dirpath, _, fnames in os.walk(cls.script_dir):
+            _remove('__init__.py', dirpath, fnames, args.dryrun)
 
 def main(args):
     args.execute(args)

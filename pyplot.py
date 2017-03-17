@@ -15,7 +15,7 @@ import configure
 SCRIPT_DIR = 'plotter'
 
 
-def register_scripts(subparsers, dirname, fnames):
+def register_scripts(subparsers, dirname):
     """Registers all scripts in `__all__` if dirname is module"""
     dirname = str(dirname[dirname.find(SCRIPT_DIR):])
     parent_module_str = dirname.replace(os.sep, '.')
@@ -83,8 +83,9 @@ def get_parser():
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
     subparsers = SubparserDict(parser)
-    os.path.walk(os.path.join(os.path.dirname(__file__), SCRIPT_DIR),
-                 register_scripts, subparsers)
+    root_dir = os.path.join(os.path.dirname(__file__), SCRIPT_DIR)
+    for dirpath, _, _ in os.walk(root_dir):
+        register_scripts(subparsers, dirpath)
 
     register_parser(subparsers[SCRIPT_DIR], 'configure', configure)
 
