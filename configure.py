@@ -19,6 +19,8 @@ def get_parser(add_help=True):
     update_parser.set_defaults(execute=Updater.update)
     clean_parser = subparsers.add_parser(
         'clean', help='Removes all `__init__` files created by update')
+    clean_parser.add_argument('-d', '--dryrun', action='store_true',
+                              help='print files instead of deleting')
     clean_parser.set_defaults(execute=Updater.clean)
     return parser
 
@@ -101,24 +103,33 @@ class Updater(object):
         print("--------------------------------------------------")
 
     @classmethod
-    def update(cls):
+    def update(cls, args):
         """Iteratively updates all all available scripts for the subdirectories"""
         os.path.walk(cls.script_dir,
                      lambda args, dirname, fnames: cls.update_dir(dirname),
                      None)
 
     @classmethod
-    def clean(cls):
+    def clean(cls, args):
         """remove all the `__init__` files in the subdirectories."""
-        def _remove(filter, dirname, fnames):
+        def _remove(args, dirname, fnames):
+            filter, dryrun = args
             full_fnames = (os.path.join(dirname, fname) for fname in fnames
                            if filter in fname)
-            map(os.remove, full_fnames)
-            print(dirname+' cleaned.')
-        os.path.walk(cls.script_dir, _remove, '__init__.py')
+            if dryrun:
+                print('In directory ' + dirname)
+                print('The following files will be removed: ')
+                map(lambda name: print(
+                        '\t' + os.path.basename(name)+'\t full name:'+name
+                    ),full_fnames)
+                print('--------------------------------------------------')
+            else:
+                map(os.remove, full_fnames)
+                print(dirname+' cleaned.')
+        os.path.walk(cls.script_dir, _remove, ('__init__.py', args.dryrun))
 
 def main(args):
-    args.execute()
+    args.execute(args)
 
 
 if __name__ == '__main__':
