@@ -13,6 +13,8 @@ from collections import defaultdict
 import argcomplete
 import configure
 
+
+CONFIG_FILE = '.pyplot.cfg'
 SCRIPT_DIR = 'plotter'
 
 
@@ -25,15 +27,37 @@ class ConfigParser(configparser.SafeConfigParser):
         Every item is a none empty line, starting with leading whitespace which
         will be striped.
         """
-        value = self.get(section, option, raw=False, vars=None)
-        list = [item.strip() for item in value.splitlines() if item.strip()]
-        return list
+        value = self.get(section, option, raw, vars)
+        items = [item.strip() for item in value.splitlines() if item.strip()]
+        return items
 
     def setlist(self, section, option, value):
         """Write a list to the config file in format readable by `getlist`."""
         seperator = '\n\t'
         value_str = seperator + seperator.join(value)
         self.set(section, option, value_str)
+
+
+# def read_configuration(config_file):
+#     """Read configuration file `config_file` to determine script directories.
+
+#     Parameters
+#     ----------
+#     config_file : string
+#         Path of the configuration file to be read.
+
+#     Returns
+#     -------
+#     script_directories : list
+#         List of the directories from which scripts should be included.
+
+#     TODO: allow local `config` files to overwrite the master file.
+#     """
+#     config = ConfigParser()
+#     with open(config_file, 'r') as config_fp:
+#         config.readfp(config_fp)
+#     script_directories = config.getlist('include', 'script_directories')
+#     return script_directories
 
 
 def register_scripts(subparsers, dirname):
@@ -155,6 +179,10 @@ def main(args):
     args.run(args)
 
 if __name__ == '__main__':
+    config = ConfigParser()
+    with open(CONFIG_FILE, 'r') as config_fp:
+        config.readfp(config_fp)
+    SCRIPT_DIRECTORIES = config.getlist('include', 'script_directories')
     PARSER = get_parser()
     ARGS = PARSER.parse_args()
     main(ARGS)
