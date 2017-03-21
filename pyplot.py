@@ -6,6 +6,7 @@
 from __future__ import absolute_import, print_function
 
 import argparse
+import ConfigParser as configparser
 import os
 from collections import defaultdict
 
@@ -13,6 +14,26 @@ import argcomplete
 import configure
 
 SCRIPT_DIR = 'plotter'
+
+
+class ConfigParser(configparser.SafeConfigParser):
+    """Subclass of `SafeConfigParser`, able to handle lists."""
+    def getlist(self, section, option, raw=False, vars=None):
+        """
+        Get an option list, from a list of lines
+
+        Every item is a none empty line, starting with leading whitespace which
+        will be striped.
+        """
+        value = self.get(section, option, raw=False, vars=None)
+        list = [item.strip() for item in value.splitlines() if item.strip()]
+        return list
+
+    def setlist(self, section, option, value):
+        """Write a list to the config file in format readable by `getlist`."""
+        seperator = '\n\t'
+        value_str = seperator + seperator.join(value)
+        self.set(section, option, value_str)
 
 
 def register_scripts(subparsers, dirname):
