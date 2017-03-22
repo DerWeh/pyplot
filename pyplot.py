@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function
 import argparse
 import ConfigParser as configparser
 import os
+import sys
 from collections import defaultdict
 
 import argcomplete
@@ -60,9 +61,10 @@ class ConfigParser(configparser.SafeConfigParser):
 #     return script_directories
 
 
-def register_scripts(subparsers, dirname):
+def register_scripts(subparsers, dirname, root_dir):
     """Registers all scripts in `__all__` if dirname is module"""
-    dirname = str(dirname[dirname.find(SCRIPT_DIR):])
+    path_tail = os.path.split(root_dir)[1]
+    dirname = str(dirname[dirname.find(path_tail):])
     parent_module_str = dirname.replace(os.sep, '.')
     try:
         parent_module = __import__(parent_module_str,
@@ -107,14 +109,20 @@ class SubparserDict(defaultdict):
     If the key doesn't exist, a new sub_parser will be added. It is only to be
     used with a dot notation (e.g. 'root.sub.subsub').
     """
-    def __init__(self, parser):
+    def __init__(self, parser, roots):
         """The dependent parser_dict is created.
 
         `parser` will be assigned as it's root.
         """
         super(SubparserDict, self).__init__()
         self.parser_dict = ParserDict(self)
-        self.parser_dict[SCRIPT_DIR] = parser
+        subparsers = parser.add_subparsers(
+            title='subcommands',
+            dest='used_subparser',
+        )
+        for root_dir in roots:
+            self.parser_dict[root_dir] = parser
+            self[root_dir] = subparsers
 
     def __missing__(self, key):
         self[key] = self.parser_dict[key].add_subparsers(
@@ -124,15 +132,23 @@ class SubparserDict(defaultdict):
         return self[key]
 
 
-def get_parser():
+def get_parser(roots):
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
-    subparsers = SubparserDict(parser)
-    root_dir = os.path.join(os.path.dirname(__file__), SCRIPT_DIR)
-    for dirpath, _, _ in os.walk(root_dir):
-        register_scripts(subparsers, dirpath)
+    subparsers = SubparserDict(parser, (os.path.split(root)[1] for root in roots))
+    # root_dir = os.path.join(os.path.dirname(__file__), SCRIPT_DIR)
+    for root_dir in roots:
+        dir, root_module_str = os.path.split(root_dir)
+        sys.path.insert(0, dir)
+        try:
+            module = __import__(root_module_str)
+        except ImportError:
+            pass  # module contains no init file, configure add must be run
+        sys.path.remove(dir)
+        for dirpath, _, _ in os.walk(root_dir):
+            register_scripts(subparsers, dirpath, root_dir)
 
-    register_parser(subparsers[SCRIPT_DIR], 'configure', configure)
+    register_parser(subparsers[os.path.split(roots[0])[1]], 'configure', configure)
 
     argcomplete.autocomplete(parser)
     return parser
@@ -169,7 +185,6 @@ def register_parser(subparsers, module_str, module):
 
 def substitute(args):
     """replace `sys.argv` to launch a script without 'get_parser'"""
-    import sys
     replace_argv = [args.name,] + args.arguments
     sys.argv = replace_argv
     args.main()
@@ -183,6 +198,6 @@ if __name__ == '__main__':
     with open(CONFIG_FILE, 'r') as config_fp:
         config.readfp(config_fp)
     SCRIPT_DIRECTORIES = config.getlist('include', 'script_directories')
-    PARSER = get_parser()
+    PARSER = get_parser(SCRIPT_DIRECTORIES)
     ARGS = PARSER.parse_args()
     main(ARGS)
