@@ -10,8 +10,7 @@ import os.path
 from string import Formatter
 from functools import partial
 
-import common
-
+from . import common
 
 def get_parser(add_help=True):
     """Return the ArgumentParser, set add_help=False to use as parent."""

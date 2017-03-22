@@ -2,12 +2,12 @@
 Tests to check some functionality of `configure`
 """
 
-from os import path, pardir
-from sys import path as syspath
+# from os import path, pardir
+# from sys import path as syspath
 
-# append root of project
-PATH = path.abspath(path.dirname(__file__))
-syspath.append(path.join(PATH, pardir))
+# # append root of project
+# PATH = path.abspath(path.dirname(__file__))
+# syspath.insert(0, path.join(PATH, pardir))
 
 from .. import configure
 from textwrap import dedent
