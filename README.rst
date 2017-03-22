@@ -1,3 +1,5 @@
+.. sectnum::
+
 =======
 pyplot
 =======
@@ -26,7 +28,26 @@ has to be used, to make the module aware of the new script. It turns the directo
 
 -------------------------
 
-1. Required structure for the scripts:
+Developement state
+====================
+
+
+The script can currently be installed with the `setup.py` script. It would however advise to only use:
+
+.. code:: bash
+
+    $ python setup develop
+
+This is the only thing I tried so far. If it is installed, auto completion works. It is just a bit slow so far.
+
+Issues:
+----------
+
+1. Currently a config file has to be created before the script can be used, even to add config entries.
+
+-------------------------
+
+Required structure for the scripts:
 ======================================
 
 Currently the scripts to be launched form `pyplot` have to fulfill *either* of the following structures:
@@ -83,36 +104,53 @@ Examples:
 
 -------------------------
 
-2. Setting up argument completion:
+Setting up argument completion:
 ==================================
 
-
-To set up argument completion execute
+The working version is to install the script and the use:
 
 .. code:: bash
 
-    $ eval "$(register-python-argcomplete pyplot.py)"
+    $ eval "$(register-python-argcomplete pyplot)"
 
-or put it in your `.bash_rc`.
 
-Note that it doesn't properly work yet. You can only argument completion when you explicitly type the path,
-so e.g. `/home/user/pypot/pyplot.py` and `./pyplot.py`allow argument completion, but with `~/pyplot/pyplot.py`
-or an alias it doesn't work yet.
+**Old**:
+
+
+.. container:: strike
+
+  To set up argument completion execute
+
+  .. code:: bash
+
+      $ eval "$(register-python-argcomplete pyplot.py)"
+
+  or put it in your `.bash_rc`.
+
+  Note that it doesn't properly work yet. You can only argument completion when you explicitly type the path,
+  so e.g. `/home/user/pypot/pyplot.py` and `./pyplot.py`allow argument completion, but with `~/pyplot/pyplot.py`
+  or an alias it doesn't work yet.
+
 
 -------------------------
 
-3. TODO:
+TODO:
 ==========
 
-+ [O] add test for `update clean` as files are removed
-+ [O] fix autocompletion of arguments
-+ [O] make it stable (adding test)
-+ [O] make the project structure more dynamic
 
-  * [X] add config file to to specify included direcories
-  * [O] include direcotories via config script
-  * [O] allow root as well es subdirectories
-  * [O] show status
-+ [X] allow subpoints to group scripts
-+ [X] relax the structural requirements for the scripts (ArgumentParser optional)
+ - [O] fix config file issue
+ - [O] speed up autocompletion, maybe a shelf is possible
+ - [O] add test for `update clean` as files are removed
+ - [O] fix autocompletion of arguments
+ - [O] make it stable (adding test)
+ - [O] make the project structure more dynamic
+
+   * [X] add config file to to specify included direcories
+   * [O] include direcotories via config script
+   * [O] allow root as well es subdirectories
+   * [O] show status
+
+ - [X] allow subpoints to group scripts
+ - [X] relax the structural requirements for the scripts (ArgumentParser optional)
+ - [O] convert readme to `rst` for python
 
