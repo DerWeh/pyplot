@@ -137,13 +137,13 @@ def get_parser(roots):
     parser = argparse.ArgumentParser()
     subparsers = SubparserDict(parser, (os.path.split(root)[1] for root in roots))
     for root_dir in roots:
-        dir, root_module_str = os.path.split(root_dir)
-        sys.path.insert(0, dir)
+        module_dir, root_module_str = os.path.split(root_dir)
+        sys.path.insert(0, module_dir)
         try:
-            module = __import__(root_module_str)
+            __import__(root_module_str)
         except ImportError:
             pass  # module contains no init file, configure add must be run
-        sys.path.remove(dir)
+        sys.path.remove(module_dir)
         for dirpath, _, _ in os.walk(root_dir):
             register_scripts(subparsers, dirpath, root_dir)
 
@@ -193,10 +193,10 @@ def main(args):
     args.run(args)
 
 if __name__ == '__main__':
-    config = ConfigParser()
+    CONFIG = ConfigParser()
     with open(CONFIG_FILE, 'r') as config_fp:
-        config.readfp(config_fp)
-    SCRIPT_DIRECTORIES = config.getlist('include', 'script_directories')
+        CONFIG.readfp(config_fp)
+    SCRIPT_DIRECTORIES = CONFIG.getlist('include', 'script_directories')
     PARSER = get_parser(SCRIPT_DIRECTORIES)
     ARGS = PARSER.parse_args()
     main(ARGS)
