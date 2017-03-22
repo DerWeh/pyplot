@@ -2,7 +2,8 @@
 # PYTHON_ARGCOMPLETE_OK
 """Module to bundle plotting scripts
 
-`activate-global-python-argcomplete` must be run to enable auto completion """
+`activate-global-python-argcomplete` must be run to enable auto completion
+TODO: update config module to handle config file"""
 from __future__ import absolute_import, print_function
 
 import argparse
@@ -16,7 +17,6 @@ import configure
 
 
 CONFIG_FILE = '.pyplot.cfg'
-SCRIPT_DIR = 'plotter'
 
 
 class ConfigParser(configparser.SafeConfigParser):
@@ -136,7 +136,6 @@ def get_parser(roots):
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
     subparsers = SubparserDict(parser, (os.path.split(root)[1] for root in roots))
-    # root_dir = os.path.join(os.path.dirname(__file__), SCRIPT_DIR)
     for root_dir in roots:
         dir, root_module_str = os.path.split(root_dir)
         sys.path.insert(0, dir)
