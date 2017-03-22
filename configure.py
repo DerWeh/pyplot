@@ -11,7 +11,7 @@ from string import Formatter
 
 
 def get_parser(add_help=True):
-    """Return the ArgumentParser"""
+    """Return the ArgumentParser, set add_help=False to use as parent."""
     parser = argparse.ArgumentParser(description=__doc__.split('\n', 1)[0],
                                      add_help=add_help)
     subparsers = parser.add_subparsers()
@@ -57,9 +57,11 @@ class TemplateFormatter(Formatter):
 class Updater(object):
     """handles which plotting scripts are available"""
     from textwrap import dedent
+    import pyplot
 
-    projectroot = os.path.abspath(os.path.dirname(__file__))
-    script_dir = os.path.join(projectroot, 'plotter')
+    # projectroot = os.path.abspath(os.path.dirname(__file__))
+    script_directories = pyplot.SCRIPT_DIRECTORIES
+    # script_dir = os.path.join(projectroot, 'plotter')
     tformatter = TemplateFormatter()
 
     template = dedent(
@@ -70,44 +72,48 @@ class Updater(object):
     )
 
     @classmethod
-    def is_valid(cls, filename):
+    def is_valid(cls, filename, dirname):
         """checks if `filename` is a python script
 
-        Also checks that `filename` starts with '.' to avoid swaps and similar.
+        Filenames starting with `.` will be ignored (swaps and similar).
         """
         from os.path import isfile, join
-        valid = (isfile(join(cls.script_dir, filename)) and
+        valid = (isfile(join(dirname, filename)) and
                  '.py' in filename and not filename.startswith('.'))
         return valid
 
     @classmethod
     def get_modules(cls, dirname):
-        """Return all valid names of scripts in `script_dir`"""
+        """Return all valid names of scripts in `dirname`"""
         content = os.listdir(dirname)
-        scripts = [script.split('.py')[0] for script in content if cls.is_valid(script)]
+        scripts = [script.split('.py')[0] for script in content if 
+                   cls.is_valid(script, dirname)]
         module_names = set(scripts) - set(("__init__",))
         return module_names
 
     @classmethod
-    def update_dir(cls, dirname):
+    def update_dir(cls, dirname, level=0):
         """update the available plotting scripts"""
+        indent = '\t' * level
         unique = cls.get_modules(dirname)
         init_content = cls.tformatter.format(cls.template, lines=unique)
         with open(os.path.join(dirname, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
-        print("`{directory}` was successfully updated."
-              .format(directory='plotter/'+dirname.lstrip(cls.projectroot)))
-        print("The scripts:")
+        directory = os.path.split(dirname)[1]
+        print(indent + " {directory} ".format(directory=directory)
+              .center(50, '='))
+        print(indent + "Available scripts:")
         for name in unique:
-            print('\t'+name)
-        print("should now be available.")
-        print("--------------------------------------------------")
+            print(indent + '\t' + name)
 
     @classmethod
     def update(cls, args):
         """Iteratively updates all all available scripts for the subdirectories"""
-        for dirpath, _, _ in os.walk(cls.script_dir):
-            cls.update_dir(dirpath)
+        for script_dir in cls.script_directories:
+            print('Updating ' + script_dir)
+            for dirpath, _, _ in os.walk(script_dir):
+                level = dirpath.replace(script_dir,'').count(os.sep)
+                cls.update_dir(dirpath, level)
 
     @classmethod
     def clean(cls, args):
@@ -125,8 +131,9 @@ class Updater(object):
                 for name in full_fnames:
                     os.remove(name)
                 print(dirname+' cleaned.')
-        for dirpath, _, fnames in os.walk(cls.script_dir):
-            _remove('__init__.py', dirpath, fnames, args.dryrun)
+        for script_dir in cls.script_directories:
+            for dirpath, _, fnames in os.walk(script_dir):
+                _remove('__init__.py', dirpath, fnames, args.dryrun)
 
 def main(args):
     args.execute(args)
