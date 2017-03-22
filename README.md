@@ -18,6 +18,19 @@ has to be used, to make the module aware of the new script. It turns the directo
 
 -------------------------
 
+# Developement state
+
+The script can currently be installed with the `setup.py` script. It would howver advise to only use 
+
+    $ python setup develop
+
+This is the only thing I tried so far. If it is installed, autocompletion works. It is just a bit slow so far.
+
+## Issues:
+1. Currently a config file has to be created before the script can be used, even to add config entries.
+
+-------------------------
+
 # Required structure for the scripts:
 
 Currently the scripts to be launched form `pyplot` have to fulfill *either* of the following structures:
@@ -70,20 +83,27 @@ Currently the scripts to be launched form `pyplot` have to fulfill *either* of t
 
 # Setting up argument completion:
 
-To set up argument completion execute
+The working version is to install the script and the use:
 
-    $ eval "$(register-python-argcomplete pyplot.py)"
+    $ eval "$(register-python-argcomplete pyplot)"
+    
 
-or put it in your `.bash_rc`.
+~~To set up argument completion execute~~
 
-Note that it doesn't properly work yet. You can only argument completion when you explicitly type the path,
+~~$ eval "$(register-python-argcomplete pyplot.py)"~~
+
+~~or put it in your `.bash_rc`.~~
+
+~~Note that it doesn't properly work yet. You can only argument completion when you explicitly type the path,
 so e.g. `/home/user/pypot/pyplot.py` and `./pyplot.py`allow argument completion, but with `~/pyplot/pyplot.py`
-or an alias it doesn't work yet.
+or an alias it doesn't work yet.~~
 
 -------------------------
 
 # TODO:
 
+ - [ ] fix config file issue
+ - [ ] speed up autocompletion, maybe a shelf is possible
  - [ ] add test for `update clean` as files are removed
  - [ ] fix autocompletion of arguments
  - [ ] make it stable (adding test)
@@ -94,4 +114,5 @@ or an alias it doesn't work yet.
    - [ ] show status
  - [x] allow subpoints to group scripts
  - [x] relax the structural requirements for the scripts (ArgumentParser optional)
+ - [ ] convert readme to `rst` for python
 
