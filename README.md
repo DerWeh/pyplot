@@ -1,16 +1,21 @@
 # pyplot
 -------------------------
-Module to centralize plotting scripts. The scripts can be dumped into the _plotter_ folder, or subfolder in it and then be launched centrally with the __pyplot__ script.
+Module to centralize plotting scripts.
 
-Currently scripts with the right structure can be dropped into the plotter directory.
-The command:
+In the `.config.cfg` file specified directories are made accessible via __pyplot__. If we have e.g. a directory _/home/user/plotter_, scripts can be dumped into the _plotter_ folder and then be launched centrally with the __pyplot__ script via 
+
+    $ pyplot SCRIPTNAME {COMMAND LINE PARAMETERES}
+
+It is also possible to structure them in _subfolders_ and launch them via 
+
+    $ pyplot subfolder SCRIPTNAME {COMMAND LINE PARAMETERES}
+
+Before scripts are available he command:
 
     $ pyplot configure update
 
-makes the module aware of the new script.
-It can then be run via
+has to be used, to make the module aware of the new script. It turns the directories, e.g. _plotter_, into modules by creating a `__init__.py` file. Currently existing `__init__.py` files will be overwritten.
 
-    $ pyplot SCRIPTNAME {COMMAND LINE PARAMETERES}
 -------------------------
 
 # Required structure for the scripts:
@@ -18,16 +23,49 @@ It can then be run via
 Currently the scripts to be launched form `pyplot` have to fulfill *either* of the following structures:
 
 1. 
-   1. implement a function `get_parser(add_help)` which returns a `ArgumentParser` the argument parser 
+   1. Implement a function `get_parser(add_help)` which returns a `ArgumentParser` the argument parser 
       has to be created with `ArgumentParser(..., add_help=add_help)`. This is necessary that the parser 
-      can be used as a parent.
-   2. implement a `main(args)` function which takes the namespace object which would be created by the 
-      argument parser as argument
+      can be used as a parent. This way the help is also availible in the **pyplot** script.
+   2. Implement a `main(args)` function which takes the namespace object which would be created by the 
+      argument parser as argument.
 2. 
    1. don't have a function `get_parser(add_help)`
    2. implement a function `main()` which doesn't need any arguments. `sys.argv` will be replaced 
       to mimic a native call.
 
+## Examples:
+1. Using `argparser`:
+    ```python
+    import argparse
+
+
+    def get_parser(add_help=True):
+        parser = argparse.ArgumentParser(description="an example", add_help=add_help)
+        return parser
+
+
+    def main(args):
+        print('This is the main method which can use args')
+
+
+    if __name__ == '__main__':
+        PARSER = get_parser()
+        ARGS = PARSER.parse_args()
+        main(ARGS)
+    ```
+2. Without `argparser`:
+    ```python
+    import sys
+
+
+    def main(args):
+        print('This is the main method, proper sys.args are available')
+        print(sys.args)
+
+
+    if __name__ == '__main__':
+        main()
+    ```
 -------------------------
 
 # Setting up argument completion:
@@ -47,9 +85,13 @@ or an alias it doesn't work yet.
 # TODO:
 
  - [ ] add test for `update clean` as files are removed
- - [ ] fix autocompletion of arguments (enable it via `configure`)
+ - [ ] fix autocompletion of arguments
  - [ ] make it stable (adding test)
  - [ ] make the project structure more dynamic
+   - [X] add config file to to specify included direcories
+   - [ ] include direcotories via config script
+   - [ ] allow root as well es subdirectories
+   - [ ] show status
  - [x] allow subpoints to group scripts
  - [x] relax the structural requirements for the scripts (ArgumentParser optional)
 
