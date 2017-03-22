@@ -7,58 +7,13 @@ TODO: update config module to handle config file"""
 from __future__ import absolute_import, print_function
 
 import argparse
-import ConfigParser as configparser
 import os
 import sys
 from collections import defaultdict
 
 import argcomplete
 import configure
-
-
-CONFIG_FILE = '.pyplot.cfg'
-
-
-class ConfigParser(configparser.SafeConfigParser):
-    """Subclass of `SafeConfigParser`, able to handle lists."""
-    def getlist(self, section, option, raw=False, vars=None):
-        """
-        Get an option list, from a list of lines
-
-        Every item is a none empty line, starting with leading whitespace which
-        will be striped.
-        """
-        value = self.get(section, option, raw, vars)
-        items = [item.strip() for item in value.splitlines() if item.strip()]
-        return items
-
-    def setlist(self, section, option, value):
-        """Write a list to the config file in format readable by `getlist`."""
-        seperator = '\n\t'
-        value_str = seperator + seperator.join(value)
-        self.set(section, option, value_str)
-
-
-# def read_configuration(config_file):
-#     """Read configuration file `config_file` to determine script directories.
-
-#     Parameters
-#     ----------
-#     config_file : string
-#         Path of the configuration file to be read.
-
-#     Returns
-#     -------
-#     script_directories : list
-#         List of the directories from which scripts should be included.
-
-#     TODO: allow local `config` files to overwrite the master file.
-#     """
-#     config = ConfigParser()
-#     with open(config_file, 'r') as config_fp:
-#         config.readfp(config_fp)
-#     script_directories = config.getlist('include', 'script_directories')
-#     return script_directories
+from common import SCRIPT_DIRECTORIES
 
 
 def register_scripts(subparsers, dirname, root_dir):
@@ -193,10 +148,6 @@ def main(args):
     args.run(args)
 
 if __name__ == '__main__':
-    CONFIG = ConfigParser()
-    with open(CONFIG_FILE, 'r') as config_fp:
-        CONFIG.readfp(config_fp)
-    SCRIPT_DIRECTORIES = CONFIG.getlist('include', 'script_directories')
     PARSER = get_parser(SCRIPT_DIRECTORIES)
     ARGS = PARSER.parse_args()
     main(ARGS)

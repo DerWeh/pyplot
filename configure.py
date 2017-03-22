@@ -8,6 +8,9 @@ from __future__ import print_function, absolute_import
 import argparse
 import os.path
 from string import Formatter
+from functools import partial
+
+import common
 
 
 def get_parser(add_help=True):
@@ -23,6 +26,11 @@ def get_parser(add_help=True):
     clean_parser.add_argument('-d', '--dryrun', action='store_true',
                               help='print files instead of deleting')
     clean_parser.set_defaults(execute=Updater.clean)
+    add_root_parser = subparsers.add_parser(
+        'addroot', help='Add new root_dir')
+    add_root_parser.add_argument('directory')
+    add_root_parser.set_defaults(execute=add_root_dir)
+
     return parser
 
 
@@ -57,11 +65,8 @@ class TemplateFormatter(Formatter):
 class Updater(object):
     """handles which plotting scripts are available"""
     from textwrap import dedent
-    import pyplot
 
-    # projectroot = os.path.abspath(os.path.dirname(__file__))
-    script_directories = pyplot.SCRIPT_DIRECTORIES
-    # script_dir = os.path.join(projectroot, 'plotter')
+    script_directories = common.SCRIPT_DIRECTORIES
     tformatter = TemplateFormatter()
 
     template = dedent(
@@ -134,6 +139,21 @@ class Updater(object):
         for script_dir in cls.script_directories:
             for dirpath, _, fnames in os.walk(script_dir):
                 _remove('__init__.py', dirpath, fnames, args.dryrun)
+
+
+def add_root_dir(args):
+    """Add `dirname` to the config file as a script directory"""
+    if not os.path.isdir(args.directory):
+        print('The given directory does not exist!')
+        print(args.directory)
+        return
+    dirname = os.path.abspath(args.directory)
+    if dirname not in common.SCRIPT_DIRECTORIES:
+        new_script_directories = common.SCRIPT_DIRECTORIES + [dirname,]
+        common.CONFIG.setlist('include', 'script_directories', new_script_directories)
+        with open(common.CONFIG_FILE, 'w') as config_fp:
+            common.CONFIG.write(config_fp)
+
 
 def main(args):
     args.execute(args)
