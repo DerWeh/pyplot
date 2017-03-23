@@ -147,6 +147,10 @@ def add_root_dir(args):
         print(args.directory)
         return
     dirname = os.path.abspath(args.directory)
+    try:
+        common.CONFIG.add_section('include')
+    except common.configparser.DuplicateSectionError:
+        pass
     if dirname not in common.SCRIPT_DIRECTORIES:
         new_script_directories = common.SCRIPT_DIRECTORIES + [dirname,]
         common.CONFIG.setlist('include', 'script_directories', new_script_directories)

@@ -1,6 +1,8 @@
 """Constants and configuration needed by all scripts"""
+from __future__ import print_function, absolute_import
 
 import ConfigParser as configparser
+from os.path import expanduser
 
 
 class ConfigParser(configparser.SafeConfigParser):
@@ -23,10 +25,13 @@ class ConfigParser(configparser.SafeConfigParser):
         self.set(section, option, value_str)
 
 
-CONFIG_FILE = '.pyplot.cfg'
+CONFIG_FILE = expanduser('~/.pyplot.cfg')
 CONFIG = ConfigParser()
 
-with open(CONFIG_FILE, 'r') as config_fp:
-   CONFIG.readfp(config_fp)
-SCRIPT_DIRECTORIES = CONFIG.getlist('include', 'script_directories')
-
+try:
+    with open(CONFIG_FILE, 'r') as config_fp:
+       CONFIG.readfp(config_fp)
+except IOError:
+    SCRIPT_DIRECTORIES = []
+else:
+    SCRIPT_DIRECTORIES = CONFIG.getlist('include', 'script_directories')

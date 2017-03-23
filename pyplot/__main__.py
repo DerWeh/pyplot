@@ -1,3 +1,4 @@
+# PYTHON_ARGCOMPLETE_OK
 from . import pyplot
 from . import common
 

@@ -64,20 +64,15 @@ class SubparserDict(defaultdict):
     If the key doesn't exist, a new sub_parser will be added. It is only to be
     used with a dot notation (e.g. 'root.sub.subsub').
     """
-    def __init__(self, parser, roots):
+    def __init__(self, parser):
         """The dependent parser_dict is created.
 
         `parser` will be assigned as it's root.
         """
         super(SubparserDict, self).__init__()
         self.parser_dict = ParserDict(self)
-        subparsers = parser.add_subparsers(
-            title='subcommands',
-            dest='used_subparser',
-        )
-        for root_dir in roots:
-            self.parser_dict[root_dir] = parser
-            self[root_dir] = subparsers
+        self.parser_dict['default'] = parser
+        self['default'] = self.__missing__('default')
 
     def __missing__(self, key):
         self[key] = self.parser_dict[key].add_subparsers(
@@ -86,13 +81,18 @@ class SubparserDict(defaultdict):
         )
         return self[key]
 
+    def add_root(self, key):
+        self.parser_dict[key] = self.parser_dict['default']
+        self[key] = self['default']
+
 
 def get_parser(roots):
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
-    subparsers = SubparserDict(parser, (os.path.split(root)[1] for root in roots))
+    subparsers = SubparserDict(parser)
     for root_dir in roots:
         module_dir, root_module_str = os.path.split(root_dir)
+        subparsers.add_root(root_module_str)
         sys.path.insert(0, module_dir)
         try:
             __import__(root_module_str)
@@ -102,7 +102,7 @@ def get_parser(roots):
         for dirpath, _, _ in os.walk(root_dir):
             register_scripts(subparsers, dirpath, root_dir)
 
-    register_parser(subparsers[os.path.split(roots[0])[1]], 'configure', configure)
+    register_parser(subparsers['default'], 'configure', configure)
 
     argcomplete.autocomplete(parser)
     return parser
