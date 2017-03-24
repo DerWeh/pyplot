@@ -8,7 +8,6 @@ from __future__ import print_function, absolute_import
 import argparse
 import os.path
 from string import Formatter
-from functools import partial
 
 from . import common
 
@@ -65,7 +64,8 @@ class Updater(object):
     """handles which plotting scripts are available"""
     from textwrap import dedent
 
-    script_directories = common.SCRIPT_DIRECTORIES
+    root_directories = common.ROOT_DIRECTORIES
+    sub_directories = common.SUB_DIRECTORIES
     tformatter = TemplateFormatter()
 
     template = dedent(
@@ -113,7 +113,7 @@ class Updater(object):
     @classmethod
     def update(cls, args):
         """Iteratively updates all all available scripts for the subdirectories"""
-        for script_dir in cls.script_directories:
+        for script_dir in cls.root_directories:
             print('Updating ' + script_dir)
             for dirpath, _, _ in os.walk(script_dir):
                 level = dirpath.replace(script_dir,'').count(os.sep)
@@ -135,7 +135,7 @@ class Updater(object):
                 for name in full_fnames:
                     os.remove(name)
                 print(dirname+' cleaned.')
-        for script_dir in cls.script_directories:
+        for script_dir in cls.root_directories:
             for dirpath, _, fnames in os.walk(script_dir):
                 _remove('__init__.py', dirpath, fnames, args.dryrun)
 
@@ -151,9 +151,9 @@ def add_root_dir(args):
         common.CONFIG.add_section('include')
     except common.configparser.DuplicateSectionError:
         pass
-    if dirname not in common.SCRIPT_DIRECTORIES:
-        new_script_directories = common.SCRIPT_DIRECTORIES + [dirname,]
-        common.CONFIG.setlist('include', 'script_directories', new_script_directories)
+    if dirname not in common.ROOT_DIRECTORIES:
+        new_root_directories = common.ROOT_DIRECTORIES + [dirname,]
+        common.CONFIG.setlist('include', 'root_directories', new_root_directories)
         with open(common.CONFIG_FILE, 'w') as config_fp:
             common.CONFIG.write(config_fp)
 

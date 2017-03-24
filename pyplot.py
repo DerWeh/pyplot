@@ -10,6 +10,6 @@ from pyplot import common
 
 
 if __name__ == '__main__':
-    PARSER = pyplot.get_parser(common.SCRIPT_DIRECTORIES)
+    PARSER = pyplot.get_parser(common.ROOT_DIRECTORIES, common.SUB_DIRECTORIES)
     ARGS = PARSER.parse_args()
     raise SystemExit(pyplot.main(ARGS))

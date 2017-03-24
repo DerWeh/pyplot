@@ -13,7 +13,7 @@ from collections import defaultdict
 
 import argcomplete
 from . import configure
-from .common import SCRIPT_DIRECTORIES
+from .common import ROOT_DIRECTORIES, SUB_DIRECTORIES
 
 
 def register_scripts(subparsers, dirname, root_dir):
@@ -85,8 +85,15 @@ class SubparserDict(defaultdict):
         self.parser_dict[key] = self.parser_dict['default']
         self[key] = self['default']
 
+    def add_sub(self, key):
+        self.parser_dict[key] = self['default'].add_parser(
+            key,
+            help="::access members of {0}".format(key)
+        )
+        self[key] = self.__missing__(key)
 
-def get_parser(roots):
+
+def get_parser(roots, subs):
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
     subparsers = SubparserDict(parser)
@@ -101,6 +108,17 @@ def get_parser(roots):
         sys.path.remove(module_dir)
         for dirpath, _, _ in os.walk(root_dir):
             register_scripts(subparsers, dirpath, root_dir)
+    for sub_dir in subs:
+        module_dir, sub_module_str = os.path.split(sub_dir)
+        subparsers.add_sub(sub_module_str)
+        sys.path.insert(0, module_dir)
+        try:
+            __import__(sub_module_str)
+        except ImportError:
+            pass  # module contains no init file, configure add must be run
+        sys.path.remove(module_dir)
+        for dirpath, _, _ in os.walk(sub_dir):
+            register_scripts(subparsers, dirpath, sub_dir)
 
     register_parser(subparsers['default'], 'configure', configure)
 
@@ -148,6 +166,6 @@ def main(args):
     args.run(args)
 
 if __name__ == '__main__':
-    PARSER = get_parser(SCRIPT_DIRECTORIES)
+    PARSER = get_parser(ROOT_DIRECTORIES, SUB_DIRECTORIES)
     ARGS = PARSER.parse_args()
     main(ARGS)
