@@ -36,7 +36,7 @@ The script can currently be installed with the `setup.py` script. It would howev
 
 .. code:: bash
 
-    $ python setup develop
+    $ python setup.py develop
 
 This is the only thing I tried so far. If it is installed, auto completion works. It is just a bit slow so far.
 
