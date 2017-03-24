@@ -36,7 +36,7 @@ The script can currently be installed with the `setup.py` script. It would howev
 
 .. code:: bash
 
-    $ python setup develop
+    $ python setup.py develop
 
 This is the only thing I tried so far. If it is installed, auto completion works. It is just a bit slow so far.
 
@@ -138,19 +138,18 @@ TODO:
 ==========
 
 
- - [O] fix config file issue
- - [O] speed up autocompletion, maybe a shelf is possible
- - [O] add test for `update clean` as files are removed
- - [O] make it stable (adding test)
- - [O] make the project structure more dynamic
++ [O] fix config file issue
++ [O] speed up autocompletion, maybe a shelf is possible
++ [O] add test for `update clean` as files are removed
++ [O] make it stable (adding test)
++ [O] make the project structure more dynamic
 
-   * [X] add config file to to specify included direcories
-   * [X] include direcotories via config script
-   * [X] allow root as well es subdirectories
-   * [O] show status
-   * [O] remove directories via config script
-
- - [X] allow subpoints to group scripts
- - [X] relax the structural requirements for the scripts (ArgumentParser optional)
- - [X] convert readme to `rst` for python
+  * [X] add config file to to specify included direcories
+  * [X] include direcotories via config script
+  * [X] allow root as well es subdirectories
+  * [O] show status
+  * [O] remove directories via config script
++ [X] allow subpoints to group scripts
++ [X] relax the structural requirements for the scripts (ArgumentParser optional)
++ [X] convert readme to `rst` for python
 

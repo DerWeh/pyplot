@@ -3,7 +3,7 @@ import sys, os
 
 version = '0.1.0'
 
-with open('README.md') as file_:
+with open('README.rst') as file_:
     long_description = file_.read()
 
 setup(name='pyplot',
