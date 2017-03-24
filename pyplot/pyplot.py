@@ -82,10 +82,12 @@ class SubparserDict(defaultdict):
         return self[key]
 
     def add_root(self, key):
+        """Add *key* which refers to the root subparser *self['default']*"""
         self.parser_dict[key] = self.parser_dict['default']
         self[key] = self['default']
 
     def add_sub(self, key):
+        """Add *key* which refers to a new parser of the root subparser"""
         self.parser_dict[key] = self['default'].add_parser(
             key,
             help="::access members of {0}".format(key)
@@ -97,29 +99,19 @@ def get_parser(roots, subs):
     """Return Argument Parser, providing available scripts"""
     parser = argparse.ArgumentParser()
     subparsers = SubparserDict(parser)
-    for root_dir in roots:
-        module_dir, root_module_str = os.path.split(root_dir)
-        subparsers.add_root(root_module_str)
-        sys.path.insert(0, module_dir)
-        try:
-            __import__(root_module_str)
-        except ImportError:
-            pass  # module contains no init file, configure add must be run
-        sys.path.remove(module_dir)
-        for dirpath, _, _ in os.walk(root_dir):
-            register_scripts(subparsers, dirpath, root_dir)
-    for sub_dir in subs:
-        module_dir, sub_module_str = os.path.split(sub_dir)
-        subparsers.add_sub(sub_module_str)
-        sys.path.insert(0, module_dir)
-        try:
-            __import__(sub_module_str)
-        except ImportError:
-            pass  # module contains no init file, configure add must be run
-        sys.path.remove(module_dir)
-        for dirpath, _, _ in os.walk(sub_dir):
-            register_scripts(subparsers, dirpath, sub_dir)
-
+    for adder, directories in ((subparsers.add_root, roots),
+                               (subparsers.add_sub, subs)):
+        for dir in directories:
+            module_dir, module_str = os.path.split(dir)
+            adder(module_str)
+            sys.path.insert(0, module_dir)
+            try:
+                __import__(module_str)
+            except ImportError:
+                pass  # module contains no init file, configure add must be run
+            sys.path.remove(module_dir)
+            for dirpath, _, _ in os.walk(dir):
+                register_scripts(subparsers, dirpath, dir)
     register_parser(subparsers['default'], 'configure', configure)
 
     argcomplete.autocomplete(parser)

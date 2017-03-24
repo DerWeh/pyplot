@@ -1,7 +1,6 @@
 """
 Tests to check some functionality of `configure`
 """
-
 # from os import path, pardir
 # from sys import path as syspath
 
@@ -9,8 +8,8 @@ Tests to check some functionality of `configure`
 # PATH = path.abspath(path.dirname(__file__))
 # syspath.insert(0, path.join(PATH, pardir))
 
-from .. import configure
 from textwrap import dedent
+from .. import configure
 
 
 def test_template():

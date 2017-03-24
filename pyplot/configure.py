@@ -167,8 +167,8 @@ def add_directory(args, root=False):
     except common.configparser.DuplicateSectionError:
         pass
     if dirname not in existing_dirs:
-        new_root_directories = common.ROOT_DIRECTORIES + [dirname,]
-        common.CONFIG.setlist('include', option, new_root_directories)
+        new_directories = existing_dirs + [dirname,]
+        common.CONFIG.setlist('include', option, new_directories)
         with open(common.CONFIG_FILE, 'w') as config_fp:
             common.CONFIG.write(config_fp)
 
