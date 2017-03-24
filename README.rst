@@ -141,16 +141,16 @@ TODO:
  - [O] fix config file issue
  - [O] speed up autocompletion, maybe a shelf is possible
  - [O] add test for `update clean` as files are removed
- - [O] fix autocompletion of arguments
  - [O] make it stable (adding test)
  - [O] make the project structure more dynamic
 
    * [X] add config file to to specify included direcories
-   * [O] include direcotories via config script
-   * [O] allow root as well es subdirectories
+   * [X] include direcotories via config script
+   * [X] allow root as well es subdirectories
    * [O] show status
+   * [O] remove directories via config script
 
  - [X] allow subpoints to group scripts
  - [X] relax the structural requirements for the scripts (ArgumentParser optional)
- - [O] convert readme to `rst` for python
+ - [X] convert readme to `rst` for python
 

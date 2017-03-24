@@ -117,7 +117,7 @@ class Updater(object):
     @classmethod
     def update(cls, args):
         """Iteratively updates all all available scripts for the subdirectories"""
-        for script_dir in cls.root_directories:
+        for script_dir in cls.root_directories+cls.sub_directories:
             print('Updating ' + script_dir)
             for dirpath, _, _ in os.walk(script_dir):
                 level = dirpath.replace(script_dir,'').count(os.sep)
