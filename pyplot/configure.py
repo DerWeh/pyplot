@@ -28,6 +28,10 @@ def get_parser(add_help=True):
         'addroot', help='Add new root_dir')
     add_root_parser.add_argument('directory')
     add_root_parser.set_defaults(execute=add_root_dir)
+    add_sub_parser = subparsers.add_parser(
+        'addsub', help='Add new sub_dir')
+    add_sub_parser.add_argument('directory')
+    add_sub_parser.set_defaults(execute=add_sub_dir)
 
     return parser
 
@@ -141,7 +145,7 @@ class Updater(object):
 
 
 def add_root_dir(args):
-    """Add `dirname` to the config file as a script directory"""
+    """Add `dirname` to the config file as a root directory"""
     if not os.path.isdir(args.directory):
         print('The given directory does not exist!')
         print(args.directory)
@@ -156,6 +160,25 @@ def add_root_dir(args):
         common.CONFIG.setlist('include', 'root_directories', new_root_directories)
         with open(common.CONFIG_FILE, 'w') as config_fp:
             common.CONFIG.write(config_fp)
+
+
+def add_sub_dir(args):
+    """Add `dirname` to the config file as a sub directory"""
+    if not os.path.isdir(args.directory):
+        print('The given directory does not exist!')
+        print(args.directory)
+        return
+    dirname = os.path.abspath(args.directory)
+    try:
+        common.CONFIG.add_section('include')
+    except common.configparser.DuplicateSectionError:
+        pass
+    if dirname not in common.SUB_DIRECTORIES:
+        new_sub_directories = common.SUB_DIRECTORIES + [dirname,]
+        common.CONFIG.setlist('include', 'sub_directories', new_sub_directories)
+        with open(common.CONFIG_FILE, 'w') as config_fp:
+            common.CONFIG.write(config_fp)
+
 
 
 def main(args):
