@@ -1,7 +1,10 @@
 """
 Test to check some functionality of `common`
 """
-from cStringIO import StringIO
+try:
+    from io import StringIO
+except ImportError:
+    from cStringIO import StringIO
 from textwrap import dedent
 
 import pytest

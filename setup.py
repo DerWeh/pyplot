@@ -5,7 +5,7 @@ import subprocess
 version_file = os.path.join(os.path.dirname(__file__), 'pyplot', '__version__.py')
 
 try:  # create version from git tags
-    version = subprocess.check_output(['git', 'describe', '--tags']).strip()
+    version = str(subprocess.check_output(['git', 'describe', '--tags']).strip())
 except subprocess.CalledProcessError:  # read exiting version if not possible
     with open(version_file, 'r') as file_:
         for line in file_.readlines():

@@ -1,7 +1,11 @@
 """Constants and configuration needed by all scripts"""
 from __future__ import print_function, absolute_import
 
-import ConfigParser as configparser
+try:
+    import configparser
+except ImportError:
+    # import ConfigParser as configparser
+    raise ImportError
 from os.path import expanduser
 
 
@@ -20,7 +24,7 @@ class ConfigParser(configparser.SafeConfigParser):
         the *raw* argument is true. Values for interpolation keys are looked up 
         in the same manner as the option.
         """
-        value = self.get(section, option, raw, vars)
+        value = self.get(section, option, raw=raw, vars=vars)
         items = [item.strip() for item in value.splitlines() if item.strip()]
         return items
 
