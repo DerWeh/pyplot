@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
 import sys, os
 import subprocess
 
@@ -22,9 +23,20 @@ else: # save new version if one was generated
             '__version__ = "' + version + '"',
         ])
 
-
 with open('README.rst') as file_:
     long_description = file_.read()
+
+
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        pytest.main(self.test_args)
 
 setup(name='pyplot',
       version=version,
@@ -47,4 +59,6 @@ setup(name='pyplot',
               'pyplot = pyplot.__main__:main',
           ],
       },
+      tests_require=['pytest'],
+      cmdclass = {'test': PyTest},
       )

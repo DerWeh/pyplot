@@ -2,9 +2,9 @@
 Test to check some functionality of `common`
 """
 try:
-    from io import StringIO
-except ImportError:
     from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 from textwrap import dedent
 
 import pytest
