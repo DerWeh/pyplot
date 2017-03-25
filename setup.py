@@ -40,7 +40,7 @@ setup(name='pyplot',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          # -*- Extra requirements: -*-
+          'argcomplete',
       ],
       entry_points={
           'console_scripts': [
