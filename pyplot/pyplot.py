@@ -3,7 +3,7 @@
 """Module to bundle plotting scripts
 
 `activate-global-python-argcomplete` must be run to enable auto completion
-TODO: update config module to handle config file"""
+"""
 from __future__ import absolute_import, print_function
 
 import argparse
@@ -12,6 +12,7 @@ import sys
 from collections import defaultdict
 
 import argcomplete
+from . import __version__
 from . import configure
 from .common import ROOT_DIRECTORIES, SUB_DIRECTORIES
 
@@ -113,6 +114,9 @@ def get_parser(roots, subs):
             for dirpath, _, _ in os.walk(dir):
                 register_scripts(subparsers, dirpath, dir)
     register_parser(subparsers['default'], 'configure', configure)
+    
+    parser.add_argument('--version', action='version', 
+                        version='%(prog)s '+__version__)
 
     argcomplete.autocomplete(parser)
     return parser
