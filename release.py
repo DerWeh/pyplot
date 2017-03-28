@@ -35,14 +35,14 @@ def main():
               file=sys.stderr)
         sys.exit(errno.EINVAL)
     for old_number, new_number in zip(old_version().split('.'), args.version.split('.')):
-        if int(new_number) > int(old_number):
+        if int(new_number) > int(old_number.split('-')[0]):
             break
     else:
         print("New version " + args.version + " is not bigger than the old version " + old_version(),
               file=sys.stderr)
         sys.exit(errno.EINVAL)
     write_version(args.version)
-    subprocess.check_call(['git', 'tag', '-a ' + args.version, '-m Version ' + args.version])
+    subprocess.check_call(['git', 'tag', '-a ' + args.version, "-m 'Version " + args.version + "'"])
     if not args.dry_run:
         print('Sucessfully created new tag ' + args.version)
 
@@ -80,8 +80,13 @@ def write_version(version):
                 '# Do not change this file, it is automatically generated.\n'
                 '__version__ = "' + version + '"',
             ])
+    else:
+        print("__version__".center(50, '*'))
+        print('__version__ = "' + version + '"')
+        print("".center(50, '*'))
+
     subprocess.check_call(['git', 'add', version_file])
-    subprocess.check_call(['git', 'commit', "-m 'New version '" + version])
+    subprocess.check_call(['git', 'commit', "-m 'New version " + version + "'"])
 
 
 if __name__ == '__main__':
