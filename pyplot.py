@@ -1,15 +1,15 @@
-"""Module to bundle plotting scripts"""
+#!/usr/bin/env python
+# PYTHON_ARGCOMPLETE_OK
+"""Module to bundle plotting scripts
 
-import argparse
+`activate-global-python-argcomplete` must be run to enable auto completion
+TODO: update config module to handle config file"""
 
-
-def parse_arguments():
-    """Argument Parser, providing available scripts"""
-    parser = argparse.ArgumentParser()
-
-    args = parser.parse_args()
-    return args
+from pyplot import pyplot
+from pyplot import common
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
+    PARSER = pyplot.get_parser(common.ROOT_DIRECTORIES, common.SUB_DIRECTORIES)
+    ARGS = PARSER.parse_args()
+    raise SystemExit(pyplot.main(ARGS))
