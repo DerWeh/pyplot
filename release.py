@@ -42,7 +42,7 @@ def main():
               file=sys.stderr)
         sys.exit(errno.EINVAL)
     write_version(args.version)
-    subprocess.check_call(['git', 'tag', '-a ' + args.version, "-m 'Version " + args.version + "'"])
+    subprocess.check_call(['git', 'tag', '-a', args.version, '-m', 'Version ' + args.version])
     if not args.dry_run:
         print('Sucessfully created new tag ' + args.version)
 
@@ -86,7 +86,7 @@ def write_version(version):
         print("".center(50, '*'))
 
     subprocess.check_call(['git', 'add', version_file])
-    subprocess.check_call(['git', 'commit', "-m 'New version " + version + "'"])
+    subprocess.check_call(['git', 'commit', '-m', 'New version ' + version])
 
 
 if __name__ == '__main__':
