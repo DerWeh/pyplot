@@ -3,10 +3,11 @@
 """Module for the configuration of the pyplot script
 
 """
-from __future__ import print_function, absolute_import
+from __future__ import print_function, absolute_import, division
 
 import argparse
 import os.path
+import sys
 from string import Formatter
 from functools import partial
 
@@ -33,6 +34,9 @@ def get_parser(add_help=True):
         'addsub', help='Add new sub_dir')
     add_sub_parser.add_argument('directory')
     add_sub_parser.set_defaults(execute=add_directory)
+    remove_parser = subparsers.add_parser(
+        'rmdir', help='Removes directories form root and sub_dir list')
+    remove_parser.set_defaults(execute=remove_directory)
 
     return parser
 
@@ -171,6 +175,68 @@ def add_directory(args, root=False):
         common.CONFIG.setlist('include', option, new_directories)
         with open(common.CONFIG_FILE, 'w') as config_fp:
             common.CONFIG.write(config_fp)
+
+
+def remove_directory(args):
+    """Dialog to remove directories from the configuration file"""
+    directories = common.ROOT_DIRECTORIES + common.SUB_DIRECTORIES
+    print_directory_list(directories)
+    root_length = len(common.ROOT_DIRECTORIES)
+    index_dict = {index: (directory, common.ROOT_DIRECTORIES)
+                  for index, directory in enumerate(common.ROOT_DIRECTORIES)}
+    index_dict.update(
+        {index+root_length: (directory, common.SUB_DIRECTORIES)
+         for index, directory in enumerate(common.SUB_DIRECTORIES)}
+    )
+    while(True):  # sys.exit will be called in process_input
+        try:
+            user_input = raw_input('>>> ')
+        except NameError:
+            user_input = input('>>> ')
+        for item in user_input.split():
+            process_input(item, index_dict)
+
+
+def print_directory_list(directories):
+    """Prints the directories from the configuration file"""
+    maxwidth = len(directories)//10 + 1
+    i = 0
+    print("Root directories:")
+    print("-" * 50)
+    for directory in common.ROOT_DIRECTORIES:
+        print("{index:{width}} {directory}".format(index=i, width=maxwidth, directory=directory))
+        i += 1
+    print("Sub directories:")
+    print("-" * 50)
+    for directory in common.SUB_DIRECTORIES:
+        print("{index:{width}} {directory}".format(index=i, width=maxwidth, directory=directory))
+        i += 1
+    print("-" * 50)
+    print('Input number of directories not to handle anymore.')
+    print("Save new configuration: ['q'], abort and discard: ['a']")
+
+
+def process_input(item, index_dict):
+    """Handle a word of the user_input"""
+    if item.lower() == 'q':
+        common.CONFIG.setlist('include', 'root_directories', common.ROOT_DIRECTORIES)
+        common.CONFIG.setlist('include', 'sub_directories', common.SUB_DIRECTORIES)
+        with open(common.CONFIG_FILE, 'w') as config_fp:
+            common.CONFIG.write(config_fp)
+        print('Configuration file successfully updated.')
+        sys.exit(0)
+    elif item.lower() == 'a':
+        print("Aborted, changes won't be saved")
+        sys.exit(0)
+    else:
+        try:
+            index = int(item)
+        except ValueError:
+            print('Invalid user input '+item, file=sys.stderr)
+            sys.exit(1)
+        directory, dir_list = index_dict.pop(index)
+        dir_list.remove(directory)
+        print(directory + ' removed')
 
 
 def main(args):
