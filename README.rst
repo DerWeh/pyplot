@@ -134,6 +134,14 @@ The working version is to install the script and the use:
 
 -------------------------
 
+Issues:
+====================
+* Currently wrong ``__init__`` files in included directories will break the 
+  program. Exception handling needs to be added here to make it possible for 
+  the ``configure`` scripte to fix the problems via ``clean`` or ``update``.
+
+
+
 TODO:
 ==========
 
