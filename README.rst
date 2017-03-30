@@ -146,9 +146,9 @@ TODO:
 
    * [X] add config file to to specify included direcories
    * [X] include direcotories via config script
-   * [O] allow root as well es subdirectories
+   * [X] allow root as well es subdirectories
    * [O] show status
-   * [O] remove directories via config script
+   * [X] remove directories via config script
 
  - [X] allow subpoints to group scripts
  - [X] relax the structural requirements for the scripts (ArgumentParser optional)
