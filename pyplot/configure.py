@@ -180,9 +180,10 @@ def add_directory(args, root=False):
 class Remover(object):
     """Class to bundle functionality to remove directories from config"""
     directories = common.ROOT_DIRECTORIES + common.SUB_DIRECTORIES
+    @classmethod
     def remove_directory(cls, args):
         """Dialog to remove directories from the configuration file"""
-        cls.print_directory_list(cls.directories)
+        cls.print_directory_list()
         root_length = len(common.ROOT_DIRECTORIES)
         index_dict = {index: (directory, common.ROOT_DIRECTORIES)
                       for index, directory in enumerate(common.ROOT_DIRECTORIES)}
@@ -198,6 +199,7 @@ class Remover(object):
             for item in user_input.split():
                 cls.process_input(item, index_dict)
 
+    @classmethod
     def print_directory_list(cls):
         """Prints the directories from the configuration file"""
         maxwidth = len(cls.directories)//10 + 1
@@ -216,7 +218,8 @@ class Remover(object):
         print('Input number of directories not to handle anymore.')
         print("Save new configuration: ['q'], abort and discard: ['a']")
 
-    def process_input(item, index_dict):
+    @classmethod
+    def process_input(cls, item, index_dict):
         """Handle a word of the user_input"""
         if item.lower() == 'q':
             common.CONFIG.setlist('include', 'root_directories', common.ROOT_DIRECTORIES)
