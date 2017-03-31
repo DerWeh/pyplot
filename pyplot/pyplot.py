@@ -33,7 +33,15 @@ def register_scripts(subparsers, dirname, root_dir):
     except AttributeError:
         return
     for module_str in parent_module.__all__:
-        module = __import__(parent_module_str + '.' + module_str, fromlist=module_str)
+        try:
+            module = __import__(parent_module_str + '.' + module_str, fromlist=module_str)
+        except ImportError as imp_err:
+            if 'no module' in str(imp_err).lower():
+                print('Missing module '+module_str+'! Running `configure update` is required!',
+                      file=sys.stderr)
+            else:
+                raise
+
         register_parser(subparsers[parent_module_str], module_str, module)
 
 
