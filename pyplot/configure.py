@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 """Module for the configuration of the pyplot script
 
@@ -107,25 +108,24 @@ class Updater(object):
     @classmethod
     def update_dir(cls, dirname, level=0):
         """update the available plotting scripts"""
-        indent = '\t' * level
+        indent = '│   '*level + '├──'  # if level else ''
         unique = cls.get_modules(dirname)
         init_content = cls.tformatter.format(cls.template, lines=unique)
         with open(os.path.join(dirname, '__init__.py'), 'w') as init_file:
             init_file.write(init_content)
-        directory = os.path.split(dirname)[1]
-        print(indent + " {directory} ".format(directory=directory)
-              .center(50, '='))
-        print(indent + "Available scripts:")
         for name in unique:
-            print(indent + '\t' + name)
+            print(indent + str(name))
 
     @classmethod
     def update(cls, args):
         """Iteratively updates all all available scripts for the subdirectories"""
+        print('Updating')
+        print('Available scripts:')
+        print('-' * 50)
         for script_dir in cls.root_directories+cls.sub_directories:
-            print('Updating ' + script_dir)
+            print('├──<' + str(os.path.basename(script_dir)) + '>    ' + str(script_dir))
             for dirpath, _, _ in os.walk(script_dir):
-                level = dirpath.replace(script_dir, '').count(os.sep)
+                level = dirpath.replace(script_dir, '').count(os.sep) + 1
                 cls.update_dir(dirpath, level)
 
     @classmethod
