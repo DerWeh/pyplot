@@ -74,8 +74,7 @@ class Updater(object):
     """handles which plotting scripts are available"""
     from textwrap import dedent
 
-    root_directories = common.ROOT_DIRECTORIES
-    sub_directories = common.SUB_DIRECTORIES
+    script_directories = set(common.ROOT_DIRECTORIES + common.SUB_DIRECTORIES)
     tformatter = TemplateFormatter()
 
     template = dedent(
@@ -122,7 +121,7 @@ class Updater(object):
         print('Updating')
         print('Available scripts:')
         print('-' * 50)
-        for script_dir in cls.root_directories+cls.sub_directories:
+        for script_dir in cls.script_directories:
             print('├──<' + str(os.path.basename(script_dir)) + '>    ' + str(script_dir))
             for dirpath, _, _ in os.walk(script_dir):
                 level = dirpath.replace(script_dir, '').count(os.sep) + 1
@@ -144,10 +143,9 @@ class Updater(object):
                 for name in full_fnames:
                     os.remove(name)
                 print(dirname+' cleaned.')
-        for script_dir in cls.root_directories:
+        for script_dir in cls.script_directories:
             for dirpath, _, fnames in os.walk(script_dir):
                 _remove('__init__.py', dirpath, fnames, args.dryrun)
-
 
 
 def add_directory(args, root=False):
