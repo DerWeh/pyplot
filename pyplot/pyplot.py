@@ -26,7 +26,7 @@ def register_scripts(subparsers, dirname, root_dir):
         parent_module = __import__(parent_module_str,
                                    fromlist=parent_module_str)
     except ImportError:
-        #directories which aren't a module are ignored
+        # directories which aren't a module are ignored
         return
     try:
         parent_module.__all__
@@ -122,8 +122,8 @@ def get_parser(roots, subs):
             for dirpath, _, _ in os.walk(dir):
                 register_scripts(subparsers, dirpath, dir)
     register_parser(subparsers['default'], 'configure', configure)
-    
-    parser.add_argument('--version', action='version', 
+
+    parser.add_argument('--version', action='version',
                         version='%(prog)s '+__version__)
 
     argcomplete.autocomplete(parser)
@@ -132,7 +132,7 @@ def get_parser(roots, subs):
 
 def register_parser(subparsers, module_str, module):
     """Add a parser `module_str` to `subparsers`
-    
+
     The main function of `module` will be assigned to the `run` argument if
     `module` has a `get_parser` function, else `substitute` will be assigned."""
     try:
@@ -165,7 +165,7 @@ def register_parser(subparsers, module_str, module):
 
 def substitute(args):
     """replace `sys.argv` to launch a script without 'get_parser'"""
-    replace_argv = [args.name,] + args.arguments
+    replace_argv = [args.name, ] + args.arguments
     sys.argv = replace_argv
     args.main()
 
