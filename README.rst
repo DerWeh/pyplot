@@ -151,7 +151,7 @@ commands:
 
 .. code:: bash
 
-   $ argcomplete
+   $ autoload bashcompinit
    $ bashcompinit
 
 Then the same command as in bash_ can be used:
