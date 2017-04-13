@@ -3,6 +3,7 @@
 from . import pyplot
 from . import common
 
+
 def main():
     parser = pyplot.get_parser(common.ROOT_DIRECTORIES, common.SUB_DIRECTORIES)
     args = parser.parse_args()

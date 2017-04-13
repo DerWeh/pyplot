@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
-import sys, os
+import sys
+import os
 import subprocess
 
 version_file = os.path.join(os.path.dirname(__file__), 'pyplot', '__version__.py')
@@ -15,7 +16,7 @@ except subprocess.CalledProcessError:  # read exiting version if not possible
                 break
         else:
             raise ValueError("Could not read or generate version")
-else: # save new version if one was generated
+else:  # save new version if one was generated
     with open(version_file, 'w') as file_:
         file_.writelines([
             '"""The package version"""\n',
@@ -27,22 +28,23 @@ with open('README.rst') as file_:
     long_description = file_.read()
 
 
-
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
+
     def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
+        # import here, cause outside the eggs aren't loaded
         import pytest
         pytest.main(self.test_args)
+
 
 setup(name='pyplot',
       version=version,
       description="Module to centralize plotting scripts.",
       long_description=long_description,
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[],  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='Andreas Weh',
       author_email='andreas.weh@web.de',
@@ -60,5 +62,5 @@ setup(name='pyplot',
           ],
       },
       tests_require=['pytest'],
-      cmdclass = {'test': PyTest},
+      cmdclass={'test': PyTest},
       )
