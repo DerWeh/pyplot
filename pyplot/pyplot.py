@@ -123,9 +123,8 @@ def get_parser(roots, subs):
                 pass  # module contains no init file, configure add must be run
             sys.path.remove(module_dir)
             for dirpath, dirnames, _ in os.walk(dir, topdown=True):
-                for directory in dirnames:
-                    if directory.startswith('.'):
-                        dirnames.remove(directory)
+                for directory in [dir for dir in dirnames if dir.startswith('.')]:
+                    dirnames.remove(directory)
                 register_scripts(subparsers, dirpath, dir)
     register_parser(subparsers['default'], 'configure', configure)
 

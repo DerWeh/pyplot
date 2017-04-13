@@ -126,7 +126,9 @@ class Updater(object):
         for script_dir in cls.script_directories:
             print('├──<' + str(os.path.basename(script_dir)) +
                   '>    ' + str(script_dir))
-            for dirpath, _, _ in os.walk(script_dir):
+            for dirpath, dirnames, _ in os.walk(script_dir, topdown=True):
+                for directory in [dir for dir in dirnames if dir.startswith('.')]:
+                    dirnames.remove(directory)
                 level = dirpath.replace(script_dir, '').count(os.sep) + 1
                 cls.update_dir(dirpath, level)
 
@@ -208,13 +210,14 @@ class Remover(object):
         i = 0
         print("Root directories:")
         print("-" * 50)
+        template_str = "{index:{width}} {directory}"
         for directory in common.ROOT_DIRECTORIES:
-            print("{index:{width}} {directory}".format(index=i, width=maxwidth, directory=directory))
+            print(template_str.format(index=i, width=maxwidth, directory=directory))
             i += 1
         print("Sub directories:")
         print("-" * 50)
         for directory in common.SUB_DIRECTORIES:
-            print("{index:{width}} {directory}".format(index=i, width=maxwidth, directory=directory))
+            print(template_str.format(index=i, width=maxwidth, directory=directory))
             i += 1
         print("-" * 50)
         print('Input number of directories not to handle anymore.')
