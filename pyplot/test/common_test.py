@@ -11,6 +11,7 @@ import pytest
 
 from .. import common
 
+
 def test_configparser_getlist():
     """Test reading list with the common.ConfigParser."""
     config = common.ConfigParser()

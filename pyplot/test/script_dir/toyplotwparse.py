@@ -16,7 +16,6 @@ def main(args):
     print("Just a toy example with the right structure which does nothing.")
 
 
-
 if __name__ == '__main__':
     parser = get_parser()
     args = parser.parse_args()

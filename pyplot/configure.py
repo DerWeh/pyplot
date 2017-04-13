@@ -14,6 +14,7 @@ from functools import partial
 
 from . import common
 
+
 def get_parser(add_help=True):
     """Return the ArgumentParser, set add_help=False to use as parent."""
     parser = argparse.ArgumentParser(description=__doc__.split('\n', 1)[0],
@@ -44,7 +45,7 @@ def get_parser(add_help=True):
 
 class TemplateFormatter(Formatter):
     """substitute formatter for easy template actions
-    
+
     defines the following new formatter:
     `call`
         {foo} -> foo()
@@ -90,6 +91,7 @@ class Updater(object):
 
         Filenames starting with `.` will be ignored (swaps and similar).
         """
+        # Todo: import module to check if it has main method
         from os.path import isfile, join
         valid = (isfile(join(dirname, filename)) and
                  '.py' in filename and not filename.startswith('.'))
@@ -99,7 +101,7 @@ class Updater(object):
     def get_modules(cls, dirname):
         """Return all valid names of scripts in `dirname`"""
         content = os.listdir(dirname)
-        scripts = [script.split('.py')[0] for script in content if 
+        scripts = [script.split('.py')[0] for script in content if
                    cls.is_valid(script, dirname)]
         module_names = set(scripts) - set(("__init__",))
         return module_names
@@ -122,7 +124,8 @@ class Updater(object):
         print('Available scripts:')
         print('-' * 50)
         for script_dir in cls.script_directories:
-            print('├──<' + str(os.path.basename(script_dir)) + '>    ' + str(script_dir))
+            print('├──<' + str(os.path.basename(script_dir)) +
+                  '>    ' + str(script_dir))
             for dirpath, _, _ in os.walk(script_dir):
                 level = dirpath.replace(script_dir, '').count(os.sep) + 1
                 cls.update_dir(dirpath, level)
@@ -169,7 +172,7 @@ def add_directory(args, root=False):
     except common.configparser.DuplicateSectionError:
         pass
     if dirname not in existing_dirs:
-        new_directories = existing_dirs + [dirname,]
+        new_directories = existing_dirs + [dirname, ]
         common.CONFIG.setlist('include', option, new_directories)
         with open(common.CONFIG_FILE, 'w') as config_fp:
             common.CONFIG.write(config_fp)
@@ -178,6 +181,7 @@ def add_directory(args, root=False):
 class Remover(object):
     """Class to bundle functionality to remove directories from config"""
     directories = common.ROOT_DIRECTORIES + common.SUB_DIRECTORIES
+
     @classmethod
     def remove_directory(cls, args):
         """Dialog to remove directories from the configuration file"""
@@ -189,7 +193,7 @@ class Remover(object):
             {index+root_length: (directory, common.SUB_DIRECTORIES)
              for index, directory in enumerate(common.SUB_DIRECTORIES)}
         )
-        while(True):  # sys.exit will be called in process_input
+        while True:  # sys.exit will be called in process_input
             try:
                 user_input = raw_input('>>> ')
             except NameError:

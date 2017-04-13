@@ -11,6 +11,7 @@ from os.path import expanduser
 
 class ConfigParser(configparser.SafeConfigParser):
     """Subclass of `SafeConfigParser`, able to handle lists."""
+
     def getlist(self, section, option, raw=False, vars=None):
         """
         Get an *option* list, from a list of lines
