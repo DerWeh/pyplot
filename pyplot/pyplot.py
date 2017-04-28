@@ -115,8 +115,6 @@ def get_parser(roots, subs):
                                (subparsers.add_sub, subs)):
         for dir in directories:
             module_dir, module_str = os.path.split(dir)
-            print('adding '+ module_str)
-            print('for '+ dir)
             adder(module_str)
             sys.path.insert(0, module_dir)
             try:
@@ -160,7 +158,6 @@ def register_parser(subparsers, module_str, module):
             nargs=argparse.REMAINDER,
             help='possible unknown arguments for {module}'.format(module=module_str),
         )
-        print(module_str + ' is to be set (main)')
         module_subparser.set_defaults(run=substitute, name=module_str, main=module.main)
     else:
         module_subparser = subparsers.add_parser(
