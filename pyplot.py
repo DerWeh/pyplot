@@ -5,11 +5,9 @@
 `activate-global-python-argcomplete` must be run to enable auto completion
 TODO: update config module to handle config file"""
 
+
 from pyplot import pyplot
-from pyplot import common
 
 
 if __name__ == '__main__':
-    PARSER = pyplot.get_parser(common.ROOT_DIRECTORIES, common.SUB_DIRECTORIES)
-    ARGS = PARSER.parse_args()
-    raise SystemExit(pyplot.main(ARGS))
+    raise SystemExit(pyplot.ifmain_wrapper())

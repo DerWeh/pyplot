@@ -182,7 +182,21 @@ def main(args):
     args.run(args)
 
 
+def ifmain_wrapper():
+    """Function bundling the calls in `ifmain` to reduce redundancy"""
+    try:
+        parser = get_parser(ROOT_DIRECTORIES, SUB_DIRECTORIES)
+    except Exception as exc:
+        # in case of an error try to directly launch configure script
+        if sys.argv[1] == 'configure':
+            config_parser = configure.get_parser()
+            config_args = config_parser.parse_args(sys.argv[2:])
+            configure.main(config_args)
+        else:
+            raise exc
+    args = parser.parse_args()
+    main(args)
+
+
 if __name__ == '__main__':
-    PARSER = get_parser(ROOT_DIRECTORIES, SUB_DIRECTORIES)
-    ARGS = PARSER.parse_args()
-    main(ARGS)
+    ifmain_wrapper()
