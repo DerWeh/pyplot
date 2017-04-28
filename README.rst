@@ -119,7 +119,7 @@ Examples:
     import sys
 
 
-    def main(args):
+    def main():
         print('This is the main method, proper sys.args are available')
         print(sys.args)
 
@@ -151,7 +151,7 @@ commands:
 
 .. code:: bash
 
-   $ argcomplete
+   $ autoload bashcompinit
    $ bashcompinit
 
 Then the same command as in bash_ can be used:
