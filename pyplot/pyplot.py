@@ -186,11 +186,13 @@ def ifmain_wrapper():
     except Exception as exc:
         # in case of an error try to directly launch configure script
         if sys.argv[1] == 'configure':
+            print('Error occurred:', exc)
+            print('Continue using `configure` directly')
             config_parser = configure.get_parser()
             config_args = config_parser.parse_args(sys.argv[2:])
             configure.main(config_args)
         else:
-            raise exc
+            raise
     args = parser.parse_args()
     main(args)
 
