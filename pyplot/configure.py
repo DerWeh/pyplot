@@ -127,7 +127,7 @@ class Updater(object):
             print('├──<' + str(os.path.basename(script_dir)) +
                   '>    ' + str(script_dir))
             for dirpath, dirnames, _ in os.walk(script_dir, topdown=True):
-                for directory in [dir for dir in dirnames if dir.startswith('.')]:
+                for directory in [_dir for _dir in dirnames if _dir.startswith('.')]:
                     dirnames.remove(directory)
                 level = dirpath.replace(script_dir, '').count(os.sep) + 1
                 cls.update_dir(dirpath, level)
