@@ -89,17 +89,27 @@ class Updater(object):
     def is_valid(cls, filename, dirname):
         """checks if `filename` is a python script
 
+        A file is a valid script, if it contains '.py', doesn't start with '.'
+        and contains a main method.
         Filenames starting with `.` will be ignored (swaps and similar).
         """
-        # Todo: import module to check if it has main method
         from os.path import isfile, join
-        valid = (isfile(join(dirname, filename)) and
-                 '.py' in filename and not filename.startswith('.'))
+        absolute_file = join(dirname, filename)
+        def has_main():
+            """Return true if file has a top-level main method"""
+            with open(absolute_file, 'r') as file_:
+                for line in file_.readlines():
+                    if line.startswith('def main('):
+                        return True
+                return False
+        valid = (isfile(absolute_file) and
+                 '.py' in filename and not filename.startswith('.')
+                 and has_main())
         return valid
 
     @classmethod
     def get_modules(cls, dirname):
-        """Return all valid names of scripts in `dirname`"""
+        """Return all valid scripts in `dirname`"""
         content = os.listdir(dirname)
         scripts = [script.split('.py')[0] for script in content if
                    cls.is_valid(script, dirname)]
