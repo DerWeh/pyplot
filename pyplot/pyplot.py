@@ -193,8 +193,9 @@ def ifmain_wrapper():
             configure.main(config_args)
         else:
             raise
-    args = parser.parse_args()
-    main(args)
+    else:
+        args = parser.parse_args()
+        main(args)
 
 
 if __name__ == '__main__':
